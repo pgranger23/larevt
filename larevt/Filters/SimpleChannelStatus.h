@@ -51,7 +51,9 @@ namespace lariov {
     using ChannelSet_t = lariov::ChannelStatusProvider::ChannelSet_t;
 
     /// Configuration
-    explicit SimpleChannelStatus(fhicl::ParameterSet const& pset);
+    explicit SimpleChannelStatus(fhicl::ParameterSet const& pset, 
+                                 raw::ChannelID_t maxchannel,
+                                 raw::ChannelID_t maxgoodchannel);
 
     //
     // interface methods
@@ -93,7 +95,6 @@ namespace lariov {
 
     //
     // non-interface methods and configuration methods
-    //
 
     /// Returns the ID of the largest known channel
     raw::ChannelID_t MaxChannel() const { return fMaxChannel; }
@@ -102,51 +103,12 @@ namespace lariov {
     raw::ChannelID_t MaxChannelPresent() const { return fMaxPresentChannel; }
 
 
+   protected:
 
-    /// @name Configuration functions
-    /// @{
-
-    /**
-     * @brief Sets the service provider up
-     * @param MaxChannel ID of the last channel
-     * @param MaxGoodChannel ID of the last good channel
-     *
-     * Sets the largest ID of a physically present channel.
-     * All valid IDs smaller than this one are also considered present.
-     * If MaxGoodChannel is invalid, all channels are considered present.
-     */
-    void Setup(raw::ChannelID_t MaxChannel, raw::ChannelID_t MaxGoodChannel);
-
-    /**
-     * @brief Sets the service provider up
-     * @param MaxChannel ID of the last channel
-     *
-     * As Setup(raw::ChannelID_t, raw::ChannelID_t), but assumes all channels
-     * to be present.
-     */
-    void Setup(raw::ChannelID_t MaxChannel) { Setup(MaxChannel, MaxChannel); }
-
-    /* TODO DELME
-    /// Prepares the object to provide information about the specified time
-    /// @return always true
-    virtual bool Update(std::uint64_t) override { return true; }
-    */
-
-    ///@}
-
-      protected:
-
-    ChannelSet_t fBadChannels; ///< set of bad channels
-    ChannelSet_t fNoisyChannels; ///< set of noisy channels
-
-    raw::ChannelID_t fMaxChannel; ///< largest ID among existing channels
-    raw::ChannelID_t fMaxPresentChannel; ///< largest ID among present channels
-
-    /// cached set of good channels (lazy evaluation)
-    mutable std::unique_ptr<ChannelSet_t> fGoodChannels;
-
-    /// Fills the collection of good channels
-    void FillGoodChannels() const;
+    const raw::ChannelID_t fMaxChannel; ///< largest ID among existing channels
+    const raw::ChannelID_t fMaxPresentChannel; ///< largest ID among present channels
+    const ChannelSet_t fBadChannels; ///< set of bad channels
+    const ChannelSet_t fNoisyChannels; ///< set of noisy channels
 
   }; // class SimpleChannelStatus
 

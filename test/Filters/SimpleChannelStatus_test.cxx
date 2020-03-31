@@ -104,8 +104,7 @@ class StatusConfiguration {
     fhicl::ParameterSet config = CreateConfiguration();
 
     lariov::SimpleChannelStatus* pStatus
-      = new lariov::SimpleChannelStatus(config);
-    pStatus->Setup(fMaxChannel, fMaxPresentChannel);
+      = new lariov::SimpleChannelStatus(config, fMaxChannel, fMaxPresentChannel);
 
     std::cout
       << "\nConfiguration:"

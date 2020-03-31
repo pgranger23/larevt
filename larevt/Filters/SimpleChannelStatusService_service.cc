@@ -21,12 +21,11 @@ namespace lariov {
   //----------------------------------------------------------------------------
   SimpleChannelStatusService::SimpleChannelStatusService(fhicl::ParameterSet const& pset)
   {
-    SimpleChannelStatus* simple_filter = new SimpleChannelStatus(pset);
-
     raw::ChannelID_t MaxChannel
       = raw::ChannelID_t(art::ServiceHandle<geo::Geometry const>()->Nchannels() - 1);
+    SimpleChannelStatus* simple_filter = new SimpleChannelStatus(pset, MaxChannel, MaxChannel);
 
-    simple_filter->Setup(MaxChannel);
+    //simple_filter->Setup(MaxChannel);
 
     fProvider.reset(simple_filter);
 

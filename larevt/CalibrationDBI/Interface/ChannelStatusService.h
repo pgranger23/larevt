@@ -81,7 +81,7 @@ namespace lariov {
       ChannelStatusProvider const& GetProvider() const
         { return DoGetProvider(); }
       // will be deprecated:
-      ChannelStatusProvider const& GetFilter() const { return GetProvider(); }
+      [[deprecated("use GetProvider instead")]] ChannelStatusProvider const& GetFilter() const { return GetProvider(); }
       //@}
 
       //@{
@@ -89,7 +89,7 @@ namespace lariov {
       ChannelStatusProvider const* GetProviderPtr() const
         { return DoGetProviderPtr(); }
       // will be deprecated:
-      ChannelStatusProvider const* GetFilterPtr() const
+      [[deprecated("use GetProviderPtr")]] ChannelStatusProvider const* GetFilterPtr() const
         { return GetProviderPtr(); }
       //@}
 
@@ -116,7 +116,7 @@ namespace lariov {
 } // namespace lariov
 
 
-DECLARE_ART_SERVICE_INTERFACE(lariov::ChannelStatusService, LEGACY)
+DECLARE_ART_SERVICE_INTERFACE(lariov::ChannelStatusService, SHARED)
 
 
 // check that the requirements for lariov::ChannelStatusService are satisfied

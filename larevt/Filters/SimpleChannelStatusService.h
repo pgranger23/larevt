@@ -59,12 +59,6 @@ namespace lariov {
     virtual ChannelStatusProvider const* DoGetProviderPtr() const override
      { return fProvider.get(); }
 
-    /// Update valid channel range
-    void UpdateChannelRange();
-
-    /// React to a new run
-    void postBeginRun(art::Run const& run);
-
     std::unique_ptr<SimpleChannelStatus> fProvider;
 
   }; // class SimpleChannelStatusService
@@ -73,6 +67,6 @@ namespace lariov {
 } // namespace lariov
 
 DECLARE_ART_SERVICE_INTERFACE_IMPL
-  (lariov::SimpleChannelStatusService, lariov::ChannelStatusService, LEGACY)
+  (lariov::SimpleChannelStatusService, lariov::ChannelStatusService, SHARED)
 
 #endif // SIMPLECHANNELFILTERSERVICE_H
