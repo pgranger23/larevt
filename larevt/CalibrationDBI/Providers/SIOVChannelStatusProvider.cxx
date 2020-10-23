@@ -88,11 +88,6 @@ namespace lariov {
     return DBUpdate(ts);
   }
 
-  // Maybe update method cached data (private const version using current event time).
-
-  bool SIOVChannelStatusProvider::DBUpdate() const {
-    return DBUpdate(fEventTimeStamp);
-  }
 
   // Maybe update method cached data (private const version).
   // This is the function that does the actual work of updating data from database.
@@ -137,7 +132,7 @@ namespace lariov {
     if (fDataSource == DataSource::Default) {
       return fDefault;
     }
-    DBUpdate();
+    DBUpdate(fEventTimeStamp);
     if (fNewNoisy.HasChannel(rawToDBChannel(ch))) {
       return fNewNoisy.GetRow(rawToDBChannel(ch));
     }

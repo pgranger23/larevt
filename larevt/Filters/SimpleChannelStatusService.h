@@ -55,12 +55,12 @@ namespace lariov {
       private:
 
     virtual ChannelStatusProvider const& DoGetProvider() const override
-     { return *DoGetProviderPtr(); }
+     { return fProvider; }
     virtual ChannelStatusProvider const* DoGetProviderPtr() const override
-     { return fProvider.get(); }
-
-    std::unique_ptr<SimpleChannelStatus> fProvider;
-
+     { return &fProvider; }
+    raw::ChannelID_t fMaxChannel;
+    SimpleChannelStatus fProvider;
+ 
   }; // class SimpleChannelStatusService
 
 
