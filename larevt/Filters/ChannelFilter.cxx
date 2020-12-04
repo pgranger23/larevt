@@ -27,7 +27,6 @@
 #include "larevt/CalibrationDBI/Interface/ChannelStatusProvider.h"
 
 
-
 //
 // The following construct is rarely used:
 // I have a C++ reference as a member class, that needs to be constructed in
@@ -62,32 +61,32 @@ catch (art::Exception& e) { // automatic rethrow happens at end of block
 
 
 ///////////////////////////////////////////////////////
-bool filter::ChannelFilter::BadChannel(uint32_t channel) const {
-  return provider.IsBad(channel);
+bool filter::ChannelFilter::BadChannel(lariov::DBTimeStamp_t ts, uint32_t channel) const {
+  return provider.IsBad(ts, channel);
 }
 
 ///////////////////////////////////////////////////////
-bool filter::ChannelFilter::NoisyChannel(uint32_t channel) const{
-  return provider.IsNoisy(channel);
+bool filter::ChannelFilter::NoisyChannel(lariov::DBTimeStamp_t ts, uint32_t channel) const{
+  return provider.IsNoisy(ts, channel);
 }
 
 ///////////////////////////////////////////////////////
-std::set<uint32_t> filter::ChannelFilter::SetOfBadChannels() const {
-  return provider.BadChannels();
+std::set<uint32_t> filter::ChannelFilter::SetOfBadChannels(lariov::DBTimeStamp_t ts) const {
+  return provider.BadChannels(ts);
 }
 
 ///////////////////////////////////////////////////////
-std::set<uint32_t> filter::ChannelFilter::SetOfNoisyChannels() const {
-  return provider.NoisyChannels();
+std::set<uint32_t> filter::ChannelFilter::SetOfNoisyChannels(lariov::DBTimeStamp_t ts) const {
+  return provider.NoisyChannels(ts);
 }
 
 ///////////////////////////////////////////////////////
-filter::ChannelFilter::ChannelStatus filter::ChannelFilter::GetChannelStatus(uint32_t channel) const
+filter::ChannelFilter::ChannelStatus filter::ChannelFilter::GetChannelStatus(lariov::DBTimeStamp_t ts, uint32_t channel) const
 {
 
-  if (provider.IsGood(channel))          return GOOD;
-  else if (!provider.IsPresent(channel)) return NOTPHYSICAL;
-  else if (provider.IsBad(channel))      return DEAD;
-  else if (provider.IsNoisy(channel))    return NOISY;
+  if (provider.IsGood(ts, channel))          return GOOD;
+  else if (!provider.IsPresent(ts, channel)) return NOTPHYSICAL;
+  else if (provider.IsBad(ts, channel))      return DEAD;
+  else if (provider.IsNoisy(ts, channel))    return NOISY;
   else return DEAD; //assume all other status are equivalent to DEAD
 }

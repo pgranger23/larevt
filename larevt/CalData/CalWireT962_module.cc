@@ -224,7 +224,7 @@ namespace caldata{
       channel = digitVec->Channel();
 
       // skip bad channels
-      if(!channelStatus.IsBad(channel)) {
+      if(!channelStatus.IsBad(evt.time().value(), channel)) {
 	holder.resize(transformSize);
 
 	for(bin = 0; bin < dataSize; ++bin)

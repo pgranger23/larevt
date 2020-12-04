@@ -36,6 +36,7 @@
 #include <memory> // std::unique_ptr<>
 #include <algorithm> // std::equal(), std::transform()
 
+constexpr unsigned int TimeStamp_not_used = 0; 
 
 namespace std {
 
@@ -110,10 +111,10 @@ class StatusConfiguration {
       << "\nConfiguration:"
       << "\n  { " << config.to_string() << " }"
       << "\nLoaded from configuration:"
-      << "\n  - " << pStatus->BadChannels().size() << " bad channels: "
-        << pStatus->BadChannels()
-      << "\n  - " << pStatus->NoisyChannels().size() << " noisy channels: "
-        << pStatus->NoisyChannels()
+      << "\n  - " << pStatus->BadChannels(TimeStamp_not_used).size() << " bad channels: "
+        << pStatus->BadChannels(TimeStamp_not_used)
+      << "\n  - " << pStatus->NoisyChannels(TimeStamp_not_used).size() << " noisy channels: "
+        << pStatus->NoisyChannels(TimeStamp_not_used)
       << "\n  - largest channel ID: " << pStatus->MaxChannel()
         << ", largest present: " << pStatus->MaxChannelPresent()
       << std::endl;
@@ -169,13 +170,13 @@ void test_simple_status() {
    */
 
   // ChannelStatusBaseInterface::BadChannels()
-  std::set<raw::ChannelID_t> StatusBadChannels = pStatus->BadChannels();
+  std::set<raw::ChannelID_t> StatusBadChannels = pStatus->BadChannels(TimeStamp_not_used);
   BOOST_CHECK_EQUAL
     (StatusBadChannels.size(), statusCreator.fBadChannels.size());
   BOOST_CHECK_EQUAL(StatusBadChannels, statusCreator.fBadChannels);
 
   // ChannelStatusBaseInterface::NoisyChannels()
-  std::set<raw::ChannelID_t> StatusNoisyChannels = pStatus->NoisyChannels();
+  std::set<raw::ChannelID_t> StatusNoisyChannels = pStatus->NoisyChannels(TimeStamp_not_used);
   BOOST_CHECK_EQUAL
     (StatusNoisyChannels.size(), statusCreator.fNoisyChannels.size());
   BOOST_CHECK_EQUAL(StatusNoisyChannels, statusCreator.fNoisyChannels);
@@ -194,16 +195,16 @@ void test_simple_status() {
 
     if (bGood) GoodChannels.insert(channel);
 
-    BOOST_CHECK_EQUAL(pStatus->IsPresent(channel), bPresent);
-    BOOST_CHECK_EQUAL(pStatus->IsBad(channel), bBad);
-    BOOST_CHECK_EQUAL(pStatus->IsNoisy(channel), bNoisy);
+    BOOST_CHECK_EQUAL(pStatus->IsPresent(TimeStamp_not_used, channel), bPresent);
+    BOOST_CHECK_EQUAL(pStatus->IsBad(TimeStamp_not_used, channel), bBad);
+    BOOST_CHECK_EQUAL(pStatus->IsNoisy(TimeStamp_not_used,channel), bNoisy);
 
-    BOOST_CHECK_EQUAL(pStatus->IsGood(channel), bGood);
+    BOOST_CHECK_EQUAL(pStatus->IsGood(TimeStamp_not_used, channel), bGood);
 
   } // for channel
 
   // ChannelStatusBaseInterface::GoodChannels()
-  std::set<raw::ChannelID_t> StatusGoodChannels = pStatus->GoodChannels();
+  std::set<raw::ChannelID_t> StatusGoodChannels = pStatus->GoodChannels(TimeStamp_not_used);
   BOOST_CHECK_EQUAL(StatusGoodChannels.size(), GoodChannels.size());
   BOOST_CHECK_EQUAL(StatusGoodChannels, GoodChannels);
 

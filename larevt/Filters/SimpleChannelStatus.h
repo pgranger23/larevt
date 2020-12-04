@@ -13,6 +13,7 @@
 // LArSoft libraries
 #include "larcoreobj/SimpleTypesAndConstants/RawTypes.h" // raw::ChannelID_t
 #include "larevt/CalibrationDBI/Interface/ChannelStatusProvider.h"
+#include "larevt/CalibrationDBI/Interface/CalibrationDBIFwd.h"
 
 // Utility libraries
 namespace fhicl { class ParameterSet; }
@@ -62,18 +63,18 @@ namespace lariov {
     /// @name Single channel queries
     /// @{
     /// Returns whether the specified channel is physical and connected to wire
-    virtual bool IsPresent(raw::ChannelID_t channel) const override;
+    virtual bool IsPresent(DBTimeStamp_t ts, raw::ChannelID_t channel) const override;
 
     /// Returns whether the specified channel is physical and good
-    virtual bool IsGood(raw::ChannelID_t channel) const override
-      { return IsPresent(channel) && !IsBad(channel) && !IsNoisy(channel); }
+    virtual bool IsGood(DBTimeStamp_t ts, raw::ChannelID_t channel) const override
+      { return IsPresent(ts, channel) && !IsBad(ts, channel) && !IsNoisy(ts, channel); }
 
     /// Returns whether the specified channel is bad in the current run
-    virtual bool IsBad(raw::ChannelID_t channel) const override
+    virtual bool IsBad(DBTimeStamp_t, raw::ChannelID_t channel) const override
       { return fBadChannels.count(channel) > 0; }
 
     /// Returns whether the specified channel is noisy in the current run
-    virtual bool IsNoisy(raw::ChannelID_t channel) const override
+    virtual bool IsNoisy(DBTimeStamp_t, raw::ChannelID_t channel) const override
       { return fNoisyChannels.count(channel) > 0; }
     /// @}
 
@@ -81,14 +82,14 @@ namespace lariov {
     /// @name Global channel queries
     /// @{
     /// Returns a copy of set of good channel IDs for the current run
-    virtual ChannelSet_t GoodChannels() const override;
+    virtual ChannelSet_t GoodChannels(DBTimeStamp_t ts) const override;
 
     /// Returns a copy of set of bad channel IDs for the current run
-    virtual ChannelSet_t BadChannels() const override
+    virtual ChannelSet_t BadChannels(DBTimeStamp_t ts) const override
       { return fBadChannels; }
 
     /// Returns a copy of set of noisy channel IDs for the current run
-    virtual ChannelSet_t NoisyChannels() const override
+    virtual ChannelSet_t NoisyChannels(DBTimeStamp_t ts) const override
       { return fNoisyChannels; }
     /// @}
 

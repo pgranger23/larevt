@@ -22,7 +22,7 @@
 
 // LArSoft libraries
 #include "larcoreobj/SimpleTypesAndConstants/RawTypes.h" // raw::ChannelID_t
-
+#include "larevt/CalibrationDBI/Interface/CalibrationDBIFwd.h"
 
 /// Filters for channels, events, etc
 namespace lariov {
@@ -71,36 +71,36 @@ namespace lariov {
       virtual ~ChannelStatusProvider() = default;
 
       /// Returns whether the specified channel is physical and connected to wire
-      virtual bool IsPresent(raw::ChannelID_t channel) const = 0;
+      virtual bool IsPresent(DBTimeStamp_t ts, raw::ChannelID_t channel) const = 0;
 
       /// Returns whether the specified channel is bad in the current run
-      virtual bool IsBad(raw::ChannelID_t channel) const = 0;
+      virtual bool IsBad(DBTimeStamp_t ts, raw::ChannelID_t channel) const = 0;
 
       /// Returns whether the specified channel is noisy in the current run
-      virtual bool IsNoisy(raw::ChannelID_t channel) const = 0;
+      virtual bool IsNoisy(DBTimeStamp_t ts, raw::ChannelID_t channel) const = 0;
 
       /// Returns whether the specified channel is physical and good
-      virtual bool IsGood(raw::ChannelID_t channel) const {
-        return IsPresent(channel) && !IsBad(channel) && !IsNoisy(channel);
+      virtual bool IsGood(DBTimeStamp_t ts, raw::ChannelID_t channel) const {
+        return IsPresent(ts, channel) && !IsBad(ts, channel) && !IsNoisy(ts, channel);
       }
 
       /// Returns a status integer with arbitrary meaning
-      virtual Status_t Status(raw::ChannelID_t channel) const
+      virtual Status_t Status(DBTimeStamp_t ts, raw::ChannelID_t channel) const
         { return InvalidStatus; }
 
       /// Returns whether the specified status is a valid one
-      virtual bool HasStatus(raw::ChannelID_t channel) const
-        { return IsValidStatus(Status(channel)); }
+      virtual bool HasStatus(DBTimeStamp_t ts, raw::ChannelID_t channel) const
+        { return IsValidStatus(Status(ts, channel)); }
 
 
       /// Returns a copy of set of good channel IDs for the current run
-      virtual ChannelSet_t GoodChannels() const = 0;
+      virtual ChannelSet_t GoodChannels(DBTimeStamp_t ts) const = 0;
 
       /// Returns a copy of set of bad channel IDs for the current run
-      virtual ChannelSet_t BadChannels() const = 0;
+      virtual ChannelSet_t BadChannels(DBTimeStamp_t ts) const = 0;
 
       /// Returns a copy of set of noisy channel IDs for the current run
-      virtual ChannelSet_t NoisyChannels() const = 0;
+      virtual ChannelSet_t NoisyChannels(DBTimeStamp_t ts) const = 0;
 
 
       /* TODO DELME

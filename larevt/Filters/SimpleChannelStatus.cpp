@@ -42,7 +42,7 @@ namespace lariov {
 
 
   //----------------------------------------------------------------------------
-  bool SimpleChannelStatus::IsPresent(raw::ChannelID_t channel) const {
+  bool SimpleChannelStatus::IsPresent(DBTimeStamp_t, raw::ChannelID_t channel) const {
     bool allchannelspresent = raw::isValidChannelID(fMaxPresentChannel);
     return allchannelspresent
       ? raw::isValidChannelID(channel) && (channel <= fMaxPresentChannel)
@@ -51,7 +51,7 @@ namespace lariov {
 
 
   //----------------------------------------------------------------------------
-  SimpleChannelStatus::ChannelSet_t SimpleChannelStatus::GoodChannels() const {
+  SimpleChannelStatus::ChannelSet_t SimpleChannelStatus::GoodChannels(DBTimeStamp_t) const {
 
     ChannelSet_t GoodChannels;
     // go for the first (lowest) channel ID...

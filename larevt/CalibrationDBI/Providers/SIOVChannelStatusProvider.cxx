@@ -128,11 +128,11 @@ namespace lariov {
 
 
   //----------------------------------------------------------------------------
-  const ChannelStatus& SIOVChannelStatusProvider::GetChannelStatus(raw::ChannelID_t ch) const {
+  const ChannelStatus& SIOVChannelStatusProvider::GetChannelStatus(DBTimeStamp_t ts, raw::ChannelID_t ch) const {
     if (fDataSource == DataSource::Default) {
       return fDefault;
     }
-    DBUpdate(fEventTimeStamp);
+    DBUpdate(ts);
     if (fNewNoisy.HasChannel(rawToDBChannel(ch))) {
       return fNewNoisy.GetRow(rawToDBChannel(ch));
     }
@@ -144,7 +144,7 @@ namespace lariov {
 
   //----------------------------------------------------------------------------
   SIOVChannelStatusProvider::ChannelSet_t
-  SIOVChannelStatusProvider::GetChannelsWithStatus(chStatus status) const {
+  SIOVChannelStatusProvider::GetChannelsWithStatus(DBTimeStamp_t ts, chStatus status) const {
 
     ChannelSet_t retSet;
     retSet.clear();
@@ -161,7 +161,7 @@ namespace lariov {
     else {
       std::vector<DBChannelID_t> chs;
       for (DBChannelID_t ch=0; ch != maxChannel; ++ch) {
-	if (this->GetChannelStatus(ch).Status() == status) chs.push_back(ch);
+	if (this->GetChannelStatus(ts, ch).Status() == status) chs.push_back(ch);
       }
 
       retSet.insert(chs.begin(), chs.end());
@@ -172,16 +172,16 @@ namespace lariov {
 
   //----------------------------------------------------------------------------
   SIOVChannelStatusProvider::ChannelSet_t
-  SIOVChannelStatusProvider::GoodChannels() const {
-    return GetChannelsWithStatus(kGOOD);
+  SIOVChannelStatusProvider::GoodChannels(DBTimeStamp_t ts) const {
+    return GetChannelsWithStatus(ts, kGOOD);
   }
 
 
   //----------------------------------------------------------------------------
   SIOVChannelStatusProvider::ChannelSet_t
-  SIOVChannelStatusProvider::BadChannels() const {
-    ChannelSet_t dead = GetChannelsWithStatus(kDEAD);
-    ChannelSet_t ln = GetChannelsWithStatus(kLOWNOISE);
+  SIOVChannelStatusProvider::BadChannels(DBTimeStamp_t ts) const {
+    ChannelSet_t dead = GetChannelsWithStatus(ts, kDEAD);
+    ChannelSet_t ln = GetChannelsWithStatus(ts, kLOWNOISE);
     dead.insert(ln.begin(),ln.end());
     return dead;
   }
@@ -189,18 +189,18 @@ namespace lariov {
 
   //----------------------------------------------------------------------------
   SIOVChannelStatusProvider::ChannelSet_t
-  SIOVChannelStatusProvider::NoisyChannels() const {
-    return GetChannelsWithStatus(kNOISY);
+  SIOVChannelStatusProvider::NoisyChannels(DBTimeStamp_t ts) const {
+    return GetChannelsWithStatus(ts, kNOISY);
   }
 
 
   //----------------------------------------------------------------------------
-  void SIOVChannelStatusProvider::AddNoisyChannel(raw::ChannelID_t ch) {
+  void SIOVChannelStatusProvider::AddNoisyChannel(DBTimeStamp_t ts, raw::ChannelID_t ch) {
 
     // for c2: ISO C++17 does not allow 'register' storage class specifier
     //register DBChannelID_t const dbch = rawToDBChannel(ch);
     DBChannelID_t const dbch = rawToDBChannel(ch);
-    if (!this->IsBad(dbch) && this->IsPresent(dbch)) {
+    if (!this->IsBad(ts, dbch) && this->IsPresent(ts, dbch)) {
       ChannelStatus cs(dbch);
       cs.SetStatus(kNOISY);
       fNewNoisy.AddOrReplaceRow(cs);

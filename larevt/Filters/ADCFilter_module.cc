@@ -64,7 +64,7 @@ namespace filter {
 //      for(const raw::RawDigit* digit: filter::SelectGoodChannels(rawdigitView))
       for(const raw::RawDigit* digit: rawdigitView)
       {
-         if (!channelFilter.IsGood(digit->Channel())) continue;
+         if (!channelFilter.IsGood(evt.time().value(), digit->Channel())) continue;
          //get ADC values after decompressing
          std::vector<short> rawadc(digit->Samples());
          raw::Uncompress(digit->ADCs(),rawadc,digit->Compression());

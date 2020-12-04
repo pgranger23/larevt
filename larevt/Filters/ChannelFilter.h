@@ -21,6 +21,8 @@ namespace lariov { class ChannelStatusProvider; }
 #include <set>
 #include <stdint.h>
 
+#include "larevt/CalibrationDBI/Interface/CalibrationDBIFwd.h"
+
 namespace filter {
 
   class /* [[deprecated]] */ ChannelFilter {
@@ -35,11 +37,11 @@ namespace filter {
 
     ChannelFilter();
 
-    bool BadChannel(uint32_t channel) const;
-    bool NoisyChannel(uint32_t channel) const;
-    std::set<uint32_t> SetOfBadChannels() const;
-    std::set<uint32_t> SetOfNoisyChannels() const;
-    ChannelStatus GetChannelStatus(uint32_t channel) const;
+    bool BadChannel(lariov::DBTimeStamp_t ts, uint32_t channel) const;
+    bool NoisyChannel(lariov::DBTimeStamp_t ts, uint32_t channel) const;
+    std::set<uint32_t> SetOfBadChannels(lariov::DBTimeStamp_t ts) const;
+    std::set<uint32_t> SetOfNoisyChannels(lariov::DBTimeStamp_t ts) const;
+    ChannelStatus GetChannelStatus(lariov::DBTimeStamp_t ts, uint32_t channel) const;
 
   private:
     lariov::ChannelStatusProvider const& provider; ///< object doing the job

@@ -24,8 +24,8 @@ namespace lariov {
   fProvider{pset, fMaxChannel, fMaxChannel}
   {
     mf::LogInfo("SimpleChannelStatusService") << "Loaded from configuration:"
-      << "\n  - " << fProvider.BadChannels().size() << " bad channels"
-      << "\n  - " << fProvider.NoisyChannels().size() << " noisy channels"
+      << "\n  - " << fProvider.BadChannels(-1u).size() << " bad channels"
+      << "\n  - " << fProvider.NoisyChannels(-1u).size() << " noisy channels"
       << "\n  - largest channel ID: " << fProvider.MaxChannel()
         << ", largest present: " << fProvider.MaxChannelPresent()
       ;

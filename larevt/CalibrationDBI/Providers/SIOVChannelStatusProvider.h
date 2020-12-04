@@ -48,7 +48,7 @@ namespace lariov {
       // non-interface methods
       //
       /// Returns Channel Status
-      const ChannelStatus& GetChannelStatus(raw::ChannelID_t channel) const;
+      const ChannelStatus& GetChannelStatus(DBTimeStamp_t ts, raw::ChannelID_t channel) const;
 
       //
       // interface methods
@@ -57,40 +57,40 @@ namespace lariov {
       /// @name Single channel queries
       /// @{
       /// Returns whether the specified channel is physical and connected to wire
-      bool IsPresent(raw::ChannelID_t channel) const override {
-        return GetChannelStatus(channel).IsPresent();
+      bool IsPresent(DBTimeStamp_t ts, raw::ChannelID_t channel) const override {
+        return GetChannelStatus(ts, channel).IsPresent();
       }
 
       /// Returns whether the specified channel is bad in the current run
-      bool IsBad(raw::ChannelID_t channel) const override {
-        return GetChannelStatus(channel).IsDead() || GetChannelStatus(channel).IsLowNoise() || !IsPresent(channel);
+      bool IsBad(DBTimeStamp_t ts, raw::ChannelID_t channel) const override {
+        return GetChannelStatus(ts, channel).IsDead() || GetChannelStatus(ts, channel).IsLowNoise() || !IsPresent(ts, channel);
       }
 
       /// Returns whether the specified channel is noisy in the current run
-      bool IsNoisy(raw::ChannelID_t channel) const override {
-        return GetChannelStatus(channel).IsNoisy();
+      bool IsNoisy(DBTimeStamp_t ts, raw::ChannelID_t channel) const override {
+        return GetChannelStatus(ts, channel).IsNoisy();
       }
 
       /// Returns whether the specified channel is physical and good
-      bool IsGood(raw::ChannelID_t channel) const override {
-        return GetChannelStatus(channel).IsGood();
+      bool IsGood(DBTimeStamp_t ts, raw::ChannelID_t channel) const override {
+        return GetChannelStatus(ts, channel).IsGood();
       }
       /// @}
 
-      Status_t Status(raw::ChannelID_t channel) const override {
-        return (Status_t) this->GetChannelStatus(channel).Status();
+      Status_t Status(DBTimeStamp_t ts, raw::ChannelID_t channel) const override {
+        return (Status_t) this->GetChannelStatus(ts, channel).Status();
       }
 
       /// @name Global channel queries
       /// @{
       /// Returns a copy of set of good channel IDs for the current run
-      ChannelSet_t GoodChannels() const override;
+      ChannelSet_t GoodChannels(DBTimeStamp_t ts) const override;
 
       /// Returns a copy of set of bad channel IDs for the current run
-      ChannelSet_t BadChannels() const override;
+      ChannelSet_t BadChannels(DBTimeStamp_t ts) const override;
 
       /// Returns a copy of set of noisy channel IDs for the current run
-      ChannelSet_t NoisyChannels() const override;
+      ChannelSet_t NoisyChannels(DBTimeStamp_t ts) const override;
       /// @}
 
 
@@ -103,7 +103,7 @@ namespace lariov {
       bool Update(DBTimeStamp_t);
 
       /// Allows a service to add to the list of noisy channels
-      void AddNoisyChannel(raw::ChannelID_t ch);
+      void AddNoisyChannel(DBTimeStamp_t ts, raw::ChannelID_t ch);
 
       ///@}
 
@@ -128,7 +128,7 @@ namespace lariov {
       Snapshot<ChannelStatus> fNewNoisy;        // Updated once per event.
       ChannelStatus fDefault;
 
-      ChannelSet_t GetChannelsWithStatus(chStatus status) const;
+      ChannelSet_t GetChannelsWithStatus(DBTimeStamp_t ts, chStatus status) const;
 
   }; // class SIOVChannelStatusProvider
 

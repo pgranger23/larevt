@@ -51,7 +51,7 @@ namespace lariov {
     std::vector<unsigned int> KnownBadChannels;
 
     template <typename Obj>
-    unsigned int testObject(Obj const* pChStatus) const;
+    unsigned int testObject(lariov::DBTimeStamp_t ts, Obj const* pChStatus) const;
 
 
     static const std::vector<unsigned int> EmptyVect; ///< for initializations
@@ -130,7 +130,7 @@ namespace lariov {
       << "\nTesting base interface...";
     lariov::ChannelStatusProvider const* pChStatus
       = StatusSrvHandle->GetProviderPtr();
-    nErrors = testObject(pChStatus);
+    nErrors = testObject(-1u, pChStatus);
     if (nErrors > 0) {
       throw art::Exception(art::errors::LogicError)
         << nErrors << " errors while testing ChannelStatusProvider!";
@@ -141,7 +141,7 @@ namespace lariov {
 
   //......................................................................
   template <typename Obj>
-  unsigned int SimpleChannelStatusTest::testObject(Obj const* pChStatus) const
+  unsigned int SimpleChannelStatusTest::testObject(lariov::DBTimeStamp_t ts, Obj const* pChStatus) const
   {
     // 1. print all the channels marked non-good
     {
@@ -150,7 +150,7 @@ namespace lariov {
 
       // this is a copy of the list;
       // to avoid creating temporary objects, check channels one by one
-      auto BadChannels = pChStatus->BadChannels();
+      auto BadChannels = pChStatus->BadChannels(ts);
       log << "\nChannels marked as bad:   " << BadChannels.size();
       if (!BadChannels.empty()) {
         log << " (";
@@ -158,7 +158,7 @@ namespace lariov {
         log << ")";
       } // if bad channels
 
-      auto NoisyChannels = pChStatus->NoisyChannels();
+      auto NoisyChannels = pChStatus->NoisyChannels(ts);
       log << "\nChannels marked as noisy: " << NoisyChannels.size();
       if (!NoisyChannels.empty()) {
         log << " (";
@@ -170,7 +170,7 @@ namespace lariov {
     // 2. test the channels as in the configuration
     unsigned int nErrors = 0;
     for (const auto chId: KnownBadChannels) {
-      if (!pChStatus->IsBad(chId)) {
+      if (!pChStatus->IsBad(ts, chId)) {
         mf::LogError("SimpleChannelStatusTest")
           << "channel #" << chId << " is not bad as it should";
         ++nErrors;
@@ -178,7 +178,7 @@ namespace lariov {
     } // for knwon bad channels
 
     for (const auto chId: KnownNoisyChannels) {
-      if (!pChStatus->IsNoisy(chId)) {
+      if (!pChStatus->IsNoisy(ts, chId)) {
         mf::LogError("SimpleChannelStatusTest")
           << "channel #" << chId << " is not noisy as it should";
         ++nErrors;
@@ -186,12 +186,12 @@ namespace lariov {
     } // for knwon noisy channels
 
     for (const auto chId: KnownGoodChannels) {
-      if (pChStatus->IsBad(chId)) {
+      if (pChStatus->IsBad(ts, chId)) {
         mf::LogError("SimpleChannelStatusTest")
           << "channel #" << chId << " is bad, while it should not";
         ++nErrors;
       }
-      if (pChStatus->IsNoisy(chId)) {
+      if (pChStatus->IsNoisy(ts, chId)) {
         mf::LogError("SimpleChannelStatusTest")
           << "channel #" << chId << " is noisy, while it should not";
         ++nErrors;
