@@ -316,7 +316,7 @@ namespace lariov {
 	CompareDataset(dbdata.dataset, compare2);
       }
     }
-    fData = dbdata;
+    fData = std::move(dbdata);
     return true;
   }
 
