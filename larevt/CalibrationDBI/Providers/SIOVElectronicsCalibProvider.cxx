@@ -14,13 +14,6 @@ namespace lariov {
     DatabaseRetrievalAlg(p.get<fhicl::ParameterSet>("DatabaseRetrievalAlg")),
     fEventTimeStamp(0),
     fCurrentTimeStamp(0) {
-
-    this->Reconfigure(p);
-  }
-
-  void SIOVElectronicsCalibProvider::Reconfigure(fhicl::ParameterSet const& p) {
-
-    this->DatabaseRetrievalAlg::Reconfigure(p.get<fhicl::ParameterSet>("DatabaseRetrievalAlg"));
     fData.Clear();
     IOVTimeStamp tmp = IOVTimeStamp::MaxTimeStamp();
     tmp.SetStamp(tmp.Stamp()-1, tmp.SubStamp());
@@ -136,7 +129,7 @@ namespace lariov {
       fCurrentTimeStamp = ts;
 
       // Call non-const base class method.
-
+      //SS: work on UpdateFolder to make it getFolder. 
       result = const_cast<SIOVElectronicsCalibProvider*>(this)->UpdateFolder(ts);
       if(result) {
 	//DBFolder was updated, so now update the Snapshot

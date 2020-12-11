@@ -12,12 +12,22 @@ namespace lariov {
   typedef void *Dataset;
   typedef void *Tuple;
 
+  struct DBData {
+      DBDataset dataset;
+      // Database row cache.
+      int              rowNumber{-1};
+      DBChannelID_t    channel{0};
+      DBDataset::DBRow row;
+      bool IsValid(const IOVTimeStamp& time) const {
+        return time >= dataset.beginTime() && time < dataset.endTime();
+        }
+  };
+
   class DBFolder {
 
     public:
       DBFolder(const std::string& name, const std::string& url, const std::string& url2, 
 	       const std::string& tag = "", bool useqlite=false, bool testmode=false);
-      virtual ~DBFolder();
 
       int GetNamedChannelData(DBChannelID_t channel, const std::string& name, bool& data);
       int GetNamedChannelData(DBChannelID_t channel, const std::string& name, long& data);
@@ -29,8 +39,8 @@ namespace lariov {
       const std::string& FolderName() const {return fFolderName;}
       const std::string& Tag() const {return fTag;}
 
-      const IOVTimeStamp& CachedStart() const {return fCache.beginTime();}
-      const IOVTimeStamp& CachedEnd() const   {return fCache.endTime();}
+      const IOVTimeStamp& CachedStart() const {return fData.dataset.beginTime();}
+      const IOVTimeStamp& CachedEnd() const   {return fData.dataset.endTime();}
 
       bool UpdateData(DBTimeStamp_t raw_time);
 
@@ -47,12 +57,6 @@ namespace lariov {
       void GetRow(DBChannelID_t channel);
       size_t GetColumn(const std::string& name) const;
 
-      bool IsValid(const IOVTimeStamp& time) const {
-        if (time >= fCache.beginTime() && time < fCache.endTime()) return true;
-	else return false;
-      }
-
-
       std::string fURL;
       std::string fURL2;
       std::string fFolderName;
@@ -64,13 +68,8 @@ namespace lariov {
 
       // Database cache.
 
-      DBDataset fCache;
+      DBData fData;
 
-      // Database row cache.
-
-      int              fCachedRowNumber;
-      DBChannelID_t    fCachedChannel;
-      DBDataset::DBRow fCachedRow;
   };
 }
 

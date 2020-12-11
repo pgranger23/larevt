@@ -38,15 +38,8 @@ namespace lariov {
 			   bool usesqlite=false, bool testmode=false) :
       fFolder(new DBFolder(foldername, url, url2, tag, usesqlite, testmode)) {}
 
-      DatabaseRetrievalAlg(fhicl::ParameterSet const& p) {
-        this->Reconfigure(p);
-      }
+      DatabaseRetrievalAlg(fhicl::ParameterSet const& p);
 
-      /// Default destructor
-      virtual ~DatabaseRetrievalAlg(){}
-
-      /// Configure using fhicl::ParameterSet
-      virtual void Reconfigure(fhicl::ParameterSet const& p);
 
       /// Return true if fFolder is successfully updated
       bool UpdateFolder(DBTimeStamp_t ts) {
@@ -64,8 +57,8 @@ namespace lariov {
 
 
     protected:
-
       std::unique_ptr<DBFolder> fFolder;
+
   };
 }
 

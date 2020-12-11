@@ -29,9 +29,6 @@ namespace lariov {
       fURL = fURL.substr(0, fURL.length()-1);
     }
 
-    fCachedRowNumber = -1;
-    fCachedChannel = 0;
-
     fMaximumTimeout = 4*60; //4 minutes
 
     // If UsqSQLite is true, hunt for sqlite database file.
@@ -61,9 +58,6 @@ namespace lariov {
     }
   }
 
-  // Destructor.
-
-  DBFolder::~DBFolder() {}
 
   // Data accessors.
 
@@ -81,7 +75,7 @@ namespace lariov {
 
     // Get value.
 
-    long value = fCachedRow.getLongData(col);
+    long value = fData.row.getLongData(col);
     data = (value != 0);
 
     return err;
@@ -101,7 +95,7 @@ namespace lariov {
 
     // Get value.
 
-    data = fCachedRow.getLongData(col);
+    data = fData.row.getLongData(col);
 
     // Done.
 
@@ -122,7 +116,7 @@ namespace lariov {
 
     // Get value.
 
-    data = fCachedRow.getDoubleData(col);
+    data = fData.row.getDoubleData(col);
 
     // Done.
 
@@ -143,7 +137,7 @@ namespace lariov {
 
     // Get value.
 
-    data = fCachedRow.getStringData(col);
+    data = fData.row.getStringData(col);
 
     // Done.
 
@@ -199,7 +193,7 @@ namespace lariov {
 
   int DBFolder::GetChannelList( std::vector<DBChannelID_t>& channels ) const {
 
-    channels = fCache.channels();
+    channels = fData.dataset.channels();
     return 0;
   }
 
@@ -209,13 +203,13 @@ namespace lariov {
 
     // Check if we need to update the cached row.
 
-    if (fCachedChannel != channel ||
-	!fCachedRow.isValid() ||
-	fCachedRow.getLongData(0) != channel) {
+    if (fData.channel != channel ||
+	!fData.row.isValid() ||
+	fData.row.getLongData(0) != channel) {
 
       // Update cached row number (binary serach).
 
-      int row = fCache.getRowNumber(channel);
+      int row = fData.dataset.getRowNumber(channel);
 
       //  Throw an exception if we didn't find a matching role.
 
@@ -226,9 +220,9 @@ namespace lariov {
 
       // Update cached row.
 
-      fCachedRowNumber = row;
-      fCachedChannel = channel;
-      fCachedRow = fCache.getRow(row);
+      fData.rowNumber = row;
+      fData.channel = channel;
+      fData.row = fData.dataset.getRow(row);
     }
   }
 
@@ -236,7 +230,7 @@ namespace lariov {
 
   size_t DBFolder::GetColumn(const std::string& name) const
   {
-    int col = fCache.getColNumber(name);
+    int col = fData.dataset.getColNumber(name);
 
     // See if we found a matching column.
 
@@ -257,13 +251,10 @@ namespace lariov {
     IOVTimeStamp ts = TimeStampDecoder::DecodeTimeStamp(raw_time);
 
     //check if cache is updated
-    if (IsValid(ts)) return false;
+    if (fData.IsValid(ts)) return false;
 
     //release cached data.
-    fCache = DBDataset();
-    fCachedRow = DBDataset::DBRow();
-    fCachedRowNumber = -1;
-    fCachedChannel = 0;
+    DBData dbdata { DBDataset(), -1, 0, DBDataset::DBRow() };
 
     //get full url string
     std::stringstream fullurl;
@@ -278,7 +269,7 @@ namespace lariov {
 
     //get new dataset
     if(fSQLitePath != "" && !fTestMode) {
-      GetSQLiteData(raw_time/1000000000, fCache);
+      GetSQLiteData(raw_time/1000000000, dbdata.dataset);
     }
     else {
       if(fTestMode) {
@@ -293,9 +284,9 @@ namespace lariov {
 	std::string msg = "HTTP error from " + fullurl.str()+": status: " + std::to_string(status) + ": " + std::string(getHTTPmessage(data));
 	throw WebError(msg);
       }
-      fCache = DBDataset(data, true);
+      dbdata.dataset = DBDataset(data, true);
     }
-    //DumpDataset(fCache);
+    //DumpDataset(fData.dataset);
 
 
     // If test mode is selected, get comparison data.
@@ -305,7 +296,7 @@ namespace lariov {
 	DBDataset compare1;
 	mf::LogInfo("DBFolder") << "Accessing comparison data from sqlite database " << fSQLitePath << "\n";
 	GetSQLiteData(raw_time/1000000000, compare1);
-	CompareDataset(fCache, compare1);
+	CompareDataset(dbdata.dataset, compare1);
       }
       if(fURL2 != "") {
 	mf::LogInfo("DBFolder") <<"Accessing comparison data from second database url." << "\n";
@@ -322,9 +313,10 @@ namespace lariov {
 	  throw WebError(msg);
 	}
 	DBDataset compare2(data, true);
-	CompareDataset(fCache, compare2);
+	CompareDataset(dbdata.dataset, compare2);
       }
     }
+    fData = dbdata;
     return true;
   }
 

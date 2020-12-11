@@ -64,9 +64,6 @@ namespace lariov {
 
       DetPedestalRetrievalAlg(fhicl::ParameterSet const& p);
 
-      /// Reconfigure function called by fhicl constructor
-      void Reconfigure(fhicl::ParameterSet const& p) override;
-
       /// Update event time stamp.
       void UpdateTimeStamp(DBTimeStamp_t ts);
 

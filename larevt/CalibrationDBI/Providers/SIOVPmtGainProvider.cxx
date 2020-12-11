@@ -14,13 +14,6 @@ namespace lariov {
     DatabaseRetrievalAlg(p.get<fhicl::ParameterSet>("DatabaseRetrievalAlg")),
     fEventTimeStamp(0),
     fCurrentTimeStamp(0) {
-
-    this->Reconfigure(p);
-  }
-
-  void SIOVPmtGainProvider::Reconfigure(fhicl::ParameterSet const& p) {
-
-    this->DatabaseRetrievalAlg::Reconfigure(p.get<fhicl::ParameterSet>("DatabaseRetrievalAlg"));
     fData.Clear();
     IOVTimeStamp tmp = IOVTimeStamp::MaxTimeStamp();
     tmp.SetStamp(tmp.Stamp()-1, tmp.SubStamp());
