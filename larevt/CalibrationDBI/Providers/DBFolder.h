@@ -12,16 +12,6 @@ namespace lariov {
   typedef void *Dataset;
   typedef void *Tuple;
 
-  struct DBData {
-      DBDataset dataset;
-      // Database row cache.
-      int              rowNumber{-1};
-      DBChannelID_t    channel{0};
-      DBDataset::DBRow row;
-      bool IsValid(const IOVTimeStamp& time) const {
-        return time >= dataset.beginTime() && time < dataset.endTime();
-        }
-  };
 
   class DBFolder {
 
@@ -39,8 +29,8 @@ namespace lariov {
       const std::string& FolderName() const {return fFolderName;}
       const std::string& Tag() const {return fTag;}
 
-      const IOVTimeStamp& CachedStart() const {return fData.dataset.beginTime();}
-      const IOVTimeStamp& CachedEnd() const   {return fData.dataset.endTime();}
+      //const IOVTimeStamp& CachedStart() const {return fDataset.beginTime();}
+      //const IOVTimeStamp& CachedEnd() const   {return fDataset.endTime();}
 
       bool UpdateData(DBTimeStamp_t raw_time);
 
@@ -53,8 +43,9 @@ namespace lariov {
       bool CompareDataset(const DBDataset& data1, const DBDataset& data2) const;
 
     private:
-
-      void GetRow(DBChannelID_t channel);
+      // from 12/18/20: we start here next year.
+      // and fix binary search in DBDataSet.cxx
+      //
       size_t GetColumn(const std::string& name) const;
 
       std::string fURL;
@@ -68,7 +59,7 @@ namespace lariov {
 
       // Database cache.
 
-      DBData fData;
+      DBDataset fDataset;
 
   };
 }

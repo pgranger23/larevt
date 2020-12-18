@@ -67,15 +67,14 @@ namespace lariov {
 
     // Make sure cached row is valid.
 
-    GetRow(channel);
-
+    auto const row = fDataset.getRowForChannel(channel);
     // Get column index.
 
     size_t col = GetColumn(name);
 
     // Get value.
 
-    long value = fData.row.getLongData(col);
+    long value = row.getLongData(col);
     data = (value != 0);
 
     return err;
@@ -87,15 +86,14 @@ namespace lariov {
 
     // Make sure cached row is valid.
 
-    GetRow(channel);
-
+    auto const row = fDataset.getRowForChannel(channel);
     // Get column index.
 
     size_t col = GetColumn(name);
 
     // Get value.
 
-    data = fData.row.getLongData(col);
+    data = row.getLongData(col);
 
     // Done.
 
@@ -108,7 +106,7 @@ namespace lariov {
 
     // Make sure cached row is valid.
 
-    GetRow(channel);
+    auto const row = fDataset.getRowForChannel(channel);
 
     // Get column index.
 
@@ -116,7 +114,7 @@ namespace lariov {
 
     // Get value.
 
-    data = fData.row.getDoubleData(col);
+    data = row.getDoubleData(col);
 
     // Done.
 
@@ -129,7 +127,7 @@ namespace lariov {
 
     // Make sure cached row is valid.
 
-    GetRow(channel);
+    auto const row = fDataset.getRowForChannel(channel);
 
     // Get column index.
 
@@ -137,100 +135,25 @@ namespace lariov {
 
     // Get value.
 
-    data = fData.row.getStringData(col);
+    data = row.getStringData(col);
 
     // Done.
 
     return err;
   }
 
-  // Not sure why the following accessor is included.  Doesn't seem to be used.
-
-  /*
-  int DBFolder::GetNamedChannelData(DBChannelID_t channel, const std::string& name, std::vector<double>& data) {
-
-    data.clear();
-
-    Tuple tup;
-    size_t col = this->GetRow(channel, name, tup);
-    int err=0;
-    double buf[kBUFFER_SIZE];
-
-    DataRec *dataRec = (DataRec *)tup;
-    // for c2: col is an unsigned int and cannot be less than 0
-    // if (col < 0 || col >= dataRec->ncolumns) {
-    if (col >= dataRec->ncolumns) {
-      err=-1;
-      return err;
-    }
-
-    char* sptr = dataRec->columns[col];
-    if ( *sptr == '[') sptr +=1;  //expect an initial bracket and skip it
-    else {
-      err=-2;
-      return err;
-    }
-
-    char* eptr;
-    double val;
-    unsigned int array_size=0;
-    for (unsigned int i=0; i < kBUFFER_SIZE; ++i) {
-      val = strtod(sptr, &eptr); //Try to convert
-      if (sptr==eptr) break;     //conversion failed
-      if (*sptr=='\0') break;    //end loop if buffer ends
-
-      buf[array_size++] = val;
-
-      if ( *eptr == ']') break;  //found the closing bracket, we're done
-      else sptr = eptr+1;        //point to the next value
-    }
-
-    data.insert(data.begin(), buf, buf + array_size);
-    releaseTuple(tup);
-    return err;
-  }
-  */
 
   int DBFolder::GetChannelList( std::vector<DBChannelID_t>& channels ) const {
 
-    channels = fData.dataset.channels();
+    channels = fDataset.channels();
     return 0;
-  }
-
-  // Update cached row.
-
-  void DBFolder::GetRow(DBChannelID_t channel) {
-
-    // Check if we need to update the cached row.
-
-    if (fData.channel != channel ||
-	!fData.row.isValid() ||
-	fData.row.getLongData(0) != channel) {
-
-      // Update cached row number (binary serach).
-
-      int row = fData.dataset.getRowNumber(channel);
-
-      //  Throw an exception if we didn't find a matching role.
-
-      if(row < 0) {
-	std::string msg = "Channel " + std::to_string(channel) + " is not found in database!";
-	throw WebError(msg);
-      }
-
-      // Update cached row.
-
-      fData.rowNumber = row;
-      fData.channel = channel;
-      fData.row = fData.dataset.getRow(row);
-    }
   }
 
   // Find matching column.
 
   size_t DBFolder::GetColumn(const std::string& name) const
   {
-    int col = fData.dataset.getColNumber(name);
+    int col = fDataset.getColNumber(name);
 
     // See if we found a matching column.
 
@@ -251,10 +174,10 @@ namespace lariov {
     IOVTimeStamp ts = TimeStampDecoder::DecodeTimeStamp(raw_time);
 
     //check if cache is updated
-    if (fData.IsValid(ts)) return false;
+    if (fDataset.IsValid(ts)) return false;
 
     //release cached data.
-    DBData dbdata { DBDataset(), -1, 0, DBDataset::DBRow() };
+    DBDataset dbdataset;
 
     //get full url string
     std::stringstream fullurl;
@@ -269,7 +192,7 @@ namespace lariov {
 
     //get new dataset
     if(fSQLitePath != "" && !fTestMode) {
-      GetSQLiteData(raw_time/1000000000, dbdata.dataset);
+      GetSQLiteData(raw_time/1000000000, dbdataset);
     }
     else {
       if(fTestMode) {
@@ -284,9 +207,9 @@ namespace lariov {
 	std::string msg = "HTTP error from " + fullurl.str()+": status: " + std::to_string(status) + ": " + std::string(getHTTPmessage(data));
 	throw WebError(msg);
       }
-      dbdata.dataset = DBDataset(data, true);
+      dbdataset = DBDataset(data, true);
     }
-    //DumpDataset(fData.dataset);
+    //DumpDataset(fDataset);
 
 
     // If test mode is selected, get comparison data.
@@ -296,7 +219,7 @@ namespace lariov {
 	DBDataset compare1;
 	mf::LogInfo("DBFolder") << "Accessing comparison data from sqlite database " << fSQLitePath << "\n";
 	GetSQLiteData(raw_time/1000000000, compare1);
-	CompareDataset(dbdata.dataset, compare1);
+	CompareDataset(dbdataset, compare1);
       }
       if(fURL2 != "") {
 	mf::LogInfo("DBFolder") <<"Accessing comparison data from second database url." << "\n";
@@ -313,10 +236,10 @@ namespace lariov {
 	  throw WebError(msg);
 	}
 	DBDataset compare2(data, true);
-	CompareDataset(dbdata.dataset, compare2);
+	CompareDataset(dbdataset, compare2);
       }
     }
-    fData = std::move(dbdata);
+    fDataset = std::move(dbdataset);
     return true;
   }
 

@@ -54,6 +54,7 @@
 #include <memory>
 #include "larevt/CalibrationDBI/Interface/CalibrationDBIFwd.h"
 #include "larevt/CalibrationDBI/IOVData/IOVTimeStamp.h"
+#include "WebError.h"
 
 namespace lariov
 {
@@ -129,13 +130,24 @@ namespace lariov
 
     // Determine row and column numbers.
 
-    int getRowNumber(DBChannelID_t ch) const;
     int getColNumber(const std::string& name) const;
 
     // Access one row.
 
     DBRow getRow(size_t row) const {return DBRow(&fData[ncols()*row]);}
+    // SS: Can move the implementation to its CXX file. 
+    DBRow getRowForChannel(DBChannelID_t channel) const {
+      auto const row = getRowNumber(channel);
+      if(row < 0) {
+	     std::string msg = "Channel " + std::to_string(channel) + " is not found in database!";
+	     throw WebError(msg);
+        }
+      return getRow(row);
+      }
 
+      bool IsValid(const IOVTimeStamp& time) const {
+        return time >= fBeginTime && time < fEndTime;
+        }
   private:
 
     // Data members.
@@ -146,6 +158,7 @@ namespace lariov
     std::vector<std::string> fColTypes;    // Column types.
     std::vector<DBChannelID_t> fChannels;  // Channels.
     std::vector<value_type> fData;         // Calibration data (length nchan*ncols).
+    int getRowNumber(DBChannelID_t ch) const;
   };
 }
 
