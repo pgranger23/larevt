@@ -110,11 +110,11 @@ namespace lariov {
 	fData.SetIoV(this->Begin(), this->End());
 
 	std::vector<DBChannelID_t> channels;
-	fFolder->GetChannelList(channels);
+        fFolder.GetChannelList(channels);
 	for (auto it = channels.begin(); it != channels.end(); ++it) {
 
 	  long status;
-	  fFolder->GetNamedChannelData(*it, "status", status);
+          fFolder.GetNamedChannelData(*it, "status", status);
 
 	  ChannelStatus cs(*it);
 	  cs.SetStatus( ChannelStatus::GetStatusFromInt((int)status) );

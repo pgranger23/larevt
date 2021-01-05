@@ -29,8 +29,8 @@ namespace lariov {
       const std::string& FolderName() const {return fFolderName;}
       const std::string& Tag() const {return fTag;}
 
-      //const IOVTimeStamp& CachedStart() const {return fDataset.beginTime();}
-      //const IOVTimeStamp& CachedEnd() const   {return fDataset.endTime();}
+      const IOVTimeStamp& CachedStart() const {return fDataset.beginTime();}
+      const IOVTimeStamp& CachedEnd() const   {return fDataset.endTime();}
 
       bool UpdateData(DBTimeStamp_t raw_time);
 

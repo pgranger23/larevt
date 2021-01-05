@@ -14,10 +14,9 @@
 #ifndef DATABASERETRIEVALALG_H
 #define DATABASERETRIEVALALG_H
 
-#include <memory>
-#include "DBFolder.h"
+#include "larevt/CalibrationDBI/Providers/DBFolder.h"
 
-namespace fhicl { class ParameterSet; }
+#include "fhiclcpp/fwd.h"
 
 namespace lariov {
 
@@ -36,28 +35,28 @@ namespace lariov {
       DatabaseRetrievalAlg(const std::string& foldername, const std::string& url,
 			   const std::string& url2="", const std::string& tag="",
 			   bool usesqlite=false, bool testmode=false) :
-      fFolder(new DBFolder(foldername, url, url2, tag, usesqlite, testmode)) {}
+        fFolder{foldername, url, url2, tag, usesqlite, testmode}{}
 
-      DatabaseRetrievalAlg(fhicl::ParameterSet const& p);
+      explicit DatabaseRetrievalAlg(fhicl::ParameterSet const& p);
 
 
       /// Return true if fFolder is successfully updated
       bool UpdateFolder(DBTimeStamp_t ts) {
-        return fFolder->UpdateData(ts);
+        return fFolder.UpdateData(ts);
       }
 
       /// Get connection information
-      const std::string& URL() const {return fFolder->URL();}
-      const std::string& FolderName() const {return fFolder->FolderName();}
-      const std::string& Tag() const {return fFolder->Tag();}
+      const std::string& URL() const {return fFolder.URL();}
+      const std::string& FolderName() const {return fFolder.FolderName();}
+      const std::string& Tag() const {return fFolder.Tag();}
 
       /// Get Timestamp information
-      const IOVTimeStamp& Begin() const {return fFolder->CachedStart();}
-      const IOVTimeStamp& End() const   {return fFolder->CachedEnd();}
+      const IOVTimeStamp& Begin() const {return fFolder.CachedStart();}
+      const IOVTimeStamp& End() const   {return fFolder.CachedEnd();}
 
 
     protected:
-      std::unique_ptr<DBFolder> fFolder;
+      mutable DBFolder fFolder;
 
   };
 }

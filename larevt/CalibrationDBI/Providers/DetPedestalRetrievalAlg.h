@@ -25,7 +25,7 @@
 #include "larevt/CalibrationDBI/Interface/DetPedestalProvider.h"
 #include "larevt/CalibrationDBI/Providers/DatabaseRetrievalAlg.h"
 
-namespace fhicl { class ParameterSet; }
+#include "fhiclcpp/fwd.h"
 
 namespace lariov {
 

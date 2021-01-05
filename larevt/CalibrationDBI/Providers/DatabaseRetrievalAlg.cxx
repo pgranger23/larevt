@@ -8,14 +8,12 @@
 namespace lariov {
 
   /// Configure using fhicl::ParameterSet
-  DatabaseRetrievalAlg::DatabaseRetrievalAlg(fhicl::ParameterSet const& p) {
-
-    std::string foldername = p.get<std::string>("DBFolderName");
-    std::string url        = p.get<std::string>("DBUrl");
-    std::string url2       = p.get<std::string>("DBUrl2", "");
-    std::string tag        = p.get<std::string>("DBTag", "");
-    bool usesqlite         = p.get<bool>("UseSQLite", false);
-    bool testmode          = p.get<bool>("TestMode", false);
-    fFolder.reset(new DBFolder(foldername, url, url2, tag, usesqlite, testmode));
-  }
+  DatabaseRetrievalAlg::DatabaseRetrievalAlg(fhicl::ParameterSet const& p) :
+    DatabaseRetrievalAlg{p.get<std::string>("DBFolderName"),
+                         p.get<std::string>("DBUrl"),
+                         p.get<std::string>("DBUrl2", ""),
+                         p.get<std::string>("DBTag", ""),
+                         p.get<bool>("UseSQLite", false),
+                         p.get<bool>("TestMode", false)}
+  {}
 }

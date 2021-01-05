@@ -171,14 +171,14 @@ namespace lariov {
 	fData.SetIoV(this->Begin(), this->End());
 
 	std::vector<DBChannelID_t> channels;
-	fFolder->GetChannelList(channels);
+        fFolder.GetChannelList(channels);
 	for (auto it = channels.begin(); it != channels.end(); ++it) {
 
 	  double mean, mean_err, rms, rms_err;
-	  fFolder->GetNamedChannelData(*it, "mean",     mean);
-	  fFolder->GetNamedChannelData(*it, "mean_err", mean_err);
-	  fFolder->GetNamedChannelData(*it, "rms",      rms);
-	  fFolder->GetNamedChannelData(*it, "rms_err",  rms_err);
+          fFolder.GetNamedChannelData(*it, "mean",     mean);
+          fFolder.GetNamedChannelData(*it, "mean_err", mean_err);
+          fFolder.GetNamedChannelData(*it, "rms",      rms);
+          fFolder.GetNamedChannelData(*it, "rms_err",  rms_err);
 
 	  DetPedestal pd(*it);
 	  pd.SetPedMean( (float)mean );

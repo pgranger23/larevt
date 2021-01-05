@@ -137,14 +137,14 @@ namespace lariov {
 	fData.SetIoV(this->Begin(), this->End());
 
 	std::vector<DBChannelID_t> channels;
-	fFolder->GetChannelList(channels);
+        fFolder.GetChannelList(channels);
 	for (auto it = channels.begin(); it != channels.end(); ++it) {
 
 	  double gain, gain_err, shaping_time, shaping_time_err;
-	  fFolder->GetNamedChannelData(*it, "gain",     gain);
-	  fFolder->GetNamedChannelData(*it, "gain_err", gain_err);
-	  fFolder->GetNamedChannelData(*it, "shaping_time",     shaping_time);
-	  fFolder->GetNamedChannelData(*it, "shaping_time_err", shaping_time_err);
+          fFolder.GetNamedChannelData(*it, "gain",     gain);
+          fFolder.GetNamedChannelData(*it, "gain_err", gain_err);
+          fFolder.GetNamedChannelData(*it, "shaping_time",     shaping_time);
+          fFolder.GetNamedChannelData(*it, "shaping_time_err", shaping_time_err);
 
 
 	  ElectronicsCalib pg(*it);
