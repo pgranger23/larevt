@@ -41,8 +41,9 @@ namespace lariov {
 
 
       /// Return true if fFolder is successfully updated
-      bool UpdateFolder(DBTimeStamp_t ts) {
-        return fFolder.UpdateData(ts);
+      std::optional<DBDataset>
+      GetDataset(DBTimeStamp_t ts) const {
+        return fFolder.GetDataset(ts);
       }
 
       /// Get connection information
@@ -50,13 +51,8 @@ namespace lariov {
       const std::string& FolderName() const {return fFolder.FolderName();}
       const std::string& Tag() const {return fFolder.Tag();}
 
-      /// Get Timestamp information
-      const IOVTimeStamp& Begin() const {return fFolder.CachedStart();}
-      const IOVTimeStamp& End() const   {return fFolder.CachedEnd();}
-
-
     protected:
-      mutable DBFolder fFolder;
+      DBFolder fFolder;
 
   };
 }

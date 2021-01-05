@@ -110,32 +110,28 @@ namespace lariov {
 
   bool SIOVPmtGainProvider::DBUpdate(DBTimeStamp_t ts) const {
 
-    bool result = false;
+    bool rc = false;
     if (fDataSource == DataSource::Database && ts != fCurrentTimeStamp) {
 
       mf::LogInfo("SIOVPmtGainProvider") << "SIOVPmtGainProvider::DBUpdate called with new timestamp.";
 
       fCurrentTimeStamp = ts;
 
-      // Call non-const base class method.
-
-      result = const_cast<SIOVPmtGainProvider*>(this)->UpdateFolder(ts);
+      auto result = GetDataset(ts);
       if(result) {
+        rc = true;
 	//DBFolder was updated, so now update the Snapshot
 	fData.Clear();
-	fData.SetIoV(this->Begin(), this->End());
+        fData.SetIoV(result->beginTime(), result->endTime());
 
-	std::vector<DBChannelID_t> channels;
-        fFolder.GetChannelList(channels);
-	for (auto it = channels.begin(); it != channels.end(); ++it) {
+        for (auto const channel : fFolder.GetChannelList()) {
 
-	  double gain, gain_err;
-          fFolder.GetNamedChannelData(*it, "gain",     gain);
-          fFolder.GetNamedChannelData(*it, "gain_sigma", gain_err);
+          float const gain = fFolder.GetDataAsDouble(channel, "gain");
+          float const gain_err = fFolder.GetDataAsDouble(channel, "gain_sigma");
 
-	  PmtGain pg(*it);
-	  pg.SetGain( (float)gain );
-	  pg.SetGainErr( (float)gain_err );
+          PmtGain pg(channel);
+          pg.SetGain( gain );
+          pg.SetGainErr( gain_err );
 	  pg.SetExtraInfo(CalibrationExtraInfo("PmtGain"));
 
 	  fData.AddOrReplaceRow(pg);
@@ -143,7 +139,7 @@ namespace lariov {
       }
     }
 
-    return result;
+    return rc;
   }
 
   const PmtGain& SIOVPmtGainProvider::PmtGainObject(DBChannelID_t ch) const {

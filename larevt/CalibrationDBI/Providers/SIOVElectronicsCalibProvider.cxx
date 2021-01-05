@@ -121,37 +121,33 @@ namespace lariov {
 
   bool SIOVElectronicsCalibProvider::DBUpdate(DBTimeStamp_t ts) const {
 
-    bool result = false;
+    bool rc = false;
     if (fDataSource == DataSource::Database && ts != fCurrentTimeStamp) {
 
       mf::LogInfo("SIOVElectronicsCalibProvider") << "SIOVElectronicsCalibProvider::DBUpdate called with new timestamp.";
 
       fCurrentTimeStamp = ts;
 
-      // Call non-const base class method.
-      //SS: work on UpdateFolder to make it getFolder. 
-      result = const_cast<SIOVElectronicsCalibProvider*>(this)->UpdateFolder(ts);
+      auto result = GetDataset(ts);
       if(result) {
+        rc = true;
 	//DBFolder was updated, so now update the Snapshot
 	fData.Clear();
-	fData.SetIoV(this->Begin(), this->End());
+        fData.SetIoV(result->beginTime(), result->endTime());
 
-	std::vector<DBChannelID_t> channels;
-        fFolder.GetChannelList(channels);
-	for (auto it = channels.begin(); it != channels.end(); ++it) {
+        for (auto const channel : fFolder.GetChannelList()) {
 
-	  double gain, gain_err, shaping_time, shaping_time_err;
-          fFolder.GetNamedChannelData(*it, "gain",     gain);
-          fFolder.GetNamedChannelData(*it, "gain_err", gain_err);
-          fFolder.GetNamedChannelData(*it, "shaping_time",     shaping_time);
-          fFolder.GetNamedChannelData(*it, "shaping_time_err", shaping_time_err);
+          float const gain = fFolder.GetDataAsDouble(channel, "gain");
+          float const gain_err = fFolder.GetDataAsDouble(channel, "gain_err");
+          float const shaping_time = fFolder.GetDataAsDouble(channel, "shaping_time");
+          float const shaping_time_err = fFolder.GetDataAsDouble(channel, "shaping_time_err");
 
 
-	  ElectronicsCalib pg(*it);
-	  pg.SetGain( (float)gain );
-	  pg.SetGainErr( (float)gain_err );
-	  pg.SetShapingTime( (float)shaping_time );
-	  pg.SetShapingTimeErr( (float)shaping_time_err );
+          ElectronicsCalib pg(channel);
+          pg.SetGain( gain );
+          pg.SetGainErr( gain_err );
+          pg.SetShapingTime( shaping_time );
+          pg.SetShapingTimeErr( shaping_time_err );
 	  pg.SetExtraInfo(CalibrationExtraInfo("ElectronicsCalib"));
 
 	  fData.AddOrReplaceRow(pg);
@@ -159,7 +155,7 @@ namespace lariov {
       }
     }
 
-    return result;
+    return rc;
   }
 
   const ElectronicsCalib& SIOVElectronicsCalibProvider::ElectronicsCalibObject(DBChannelID_t ch) const {

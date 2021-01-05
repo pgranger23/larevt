@@ -155,7 +155,7 @@ namespace lariov {
 
   bool DetPedestalRetrievalAlg::DBUpdate(DBTimeStamp_t ts) const {
 
-    bool result = false;
+    bool rc = false;
     if(fDataSource == DataSource::Database && ts != fCurrentTimeStamp) {
 
       mf::LogInfo("DetPedestalRetrievalAlg") << "DetPedestalRetrievalAlg::DBUpdate called with new timestamp.";
@@ -163,35 +163,33 @@ namespace lariov {
 
       // Call non-const base class method.
 
-      result = const_cast<DetPedestalRetrievalAlg*>(this)->UpdateFolder(ts);
+      auto result = GetDataset(ts);
       if(result) {
+        rc = true;
 
 	//DBFolder was updated, so now update the Snapshot
 	fData.Clear();
-	fData.SetIoV(this->Begin(), this->End());
+        fData.SetIoV(result->beginTime(), result->endTime());
 
-	std::vector<DBChannelID_t> channels;
-        fFolder.GetChannelList(channels);
-	for (auto it = channels.begin(); it != channels.end(); ++it) {
+        for (auto const channel : fFolder.GetChannelList()) {
 
-	  double mean, mean_err, rms, rms_err;
-          fFolder.GetNamedChannelData(*it, "mean",     mean);
-          fFolder.GetNamedChannelData(*it, "mean_err", mean_err);
-          fFolder.GetNamedChannelData(*it, "rms",      rms);
-          fFolder.GetNamedChannelData(*it, "rms_err",  rms_err);
+          float const mean = fFolder.GetDataAsDouble(channel, "mean");
+          float const mean_err = fFolder.GetDataAsDouble(channel, "mean_err");
+          float const rms = fFolder.GetDataAsDouble(channel, "rms");
+          float const rms_err = fFolder.GetDataAsDouble(channel, "rms_err");
 
-	  DetPedestal pd(*it);
-	  pd.SetPedMean( (float)mean );
-	  pd.SetPedMeanErr( (float)mean_err );
-	  pd.SetPedRms( (float)rms );
-	  pd.SetPedRmsErr( (float)rms_err );
+          DetPedestal pd(channel);
+          pd.SetPedMean( mean );
+          pd.SetPedMeanErr( mean_err );
+          pd.SetPedRms( rms );
+          pd.SetPedRmsErr( rms_err );
 
 	  fData.AddOrReplaceRow(pd);
 	}
       }
     }
 
-    return result;
+    return rc;
 
   }
 

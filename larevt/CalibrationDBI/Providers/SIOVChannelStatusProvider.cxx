@@ -94,7 +94,7 @@ namespace lariov {
 
   bool SIOVChannelStatusProvider::DBUpdate(DBTimeStamp_t ts) const {
 
-    bool result = false;
+    bool rc = false;
     if(fDataSource == DataSource::Database && ts != fCurrentTimeStamp) {
 
       mf::LogInfo("SIOVChannelStatusProvider") << "SIOVChannelStatusProvider::DBUpdate called with new timestamp.";
@@ -103,27 +103,25 @@ namespace lariov {
 
       // Call non-const base class method.
 
-      result = const_cast<SIOVChannelStatusProvider*>(this)->UpdateFolder(ts);
+      auto result = GetDataset(ts);
       if(result) {
+        rc = true;
 	//DBFolder was updated, so now update the Snapshot
 	fData.Clear();
-	fData.SetIoV(this->Begin(), this->End());
+        fData.SetIoV(result->beginTime(), result->endTime());
 
-	std::vector<DBChannelID_t> channels;
-        fFolder.GetChannelList(channels);
-	for (auto it = channels.begin(); it != channels.end(); ++it) {
+        for (auto const channel : fFolder.GetChannelList()) {
 
-	  long status;
-          fFolder.GetNamedChannelData(*it, "status", status);
+          int status = fFolder.GetDataAsLong(channel, "status");
 
-	  ChannelStatus cs(*it);
-	  cs.SetStatus( ChannelStatus::GetStatusFromInt((int)status) );
+          ChannelStatus cs(channel);
+          cs.SetStatus( ChannelStatus::GetStatusFromInt(status));
 
 	  fData.AddOrReplaceRow(cs);
 	}
       }
     }
-    return result;
+    return rc;
   }
 
 

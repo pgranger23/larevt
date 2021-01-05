@@ -32,7 +32,6 @@ lariov::DBDataset::DBDataset(void* dataset, bool release) :
   // Parse dataset and get number of rows.
 
   size_t nrows = getNtuples(dataset) - kNUMBER_HEADER_ROWS;
-  //mf::LogInfo("DBDataset") << "DBDataset: Number of rows = " << nrows << "\n";
   fChannels.reserve(nrows);
 
   // Process header rows.
@@ -46,9 +45,6 @@ lariov::DBDataset::DBDataset(void* dataset, bool release) :
   tup = getTuple(dataset, 0);
   getStringValue(tup, 0, buf, kBUFFER_SIZE, &err);
   fBeginTime = IOVTimeStamp::GetFromString(std::string(buf));
-  //mf::LogInfo log("DBDataset");
-  //log << "DBDataset: Begin time stamp input = " << buf << "\n";
-  //log << "DBDataset: Begin time stamp = " << fBeginTime.DBStamp() << "\n";
   releaseTuple(tup);
 
   // Extract IOV end time.
@@ -59,20 +55,15 @@ lariov::DBDataset::DBDataset(void* dataset, bool release) :
     fEndTime = IOVTimeStamp::MaxTimeStamp();
   else
     fEndTime = IOVTimeStamp::GetFromString(std::string(buf));
-  //mf::LogInfo log("DBDataset");
-  //log << "DBDataset: End time stamp input = " << buf << "\n";
-  //log << "DBDataset: End time stamp = " << fEndTime.DBStamp() << "\n";
   releaseTuple(tup);
 
   // Extract column names.
 
   tup = getTuple(dataset, 2);
   size_t ncols = getNfields(tup);
-  //mf::LogInfo("DBDataset") << "DBDataset: Number of columns = " << ncols << "\n";
   fColNames.reserve(ncols);
   for (size_t col=0; col<ncols; ++col) {
     getStringValue(tup, col, buf, kBUFFER_SIZE, &err);
-    //mf::LogInfo("DBDataset") << "DBDataset: Column name = " << buf << "\n";
     fColNames.push_back(std::string(buf));
   }
   releaseTuple(tup);
@@ -83,7 +74,6 @@ lariov::DBDataset::DBDataset(void* dataset, bool release) :
   fColTypes.reserve(ncols);
   for (size_t col=0; col < ncols; ++col) {
     getStringValue(tup, col, buf, kBUFFER_SIZE, &err);
-    //mf::LogInfo("DBDataset") << "DBDataset: Column type = " << buf << "\n";
     fColTypes.push_back(std::string(buf));
   }
   releaseTuple(tup);
@@ -92,7 +82,6 @@ lariov::DBDataset::DBDataset(void* dataset, bool release) :
 
   fData.reserve(nrows * ncols);
   for(size_t row = 0; row < nrows; ++row) {
-    //mf::LogInfo("DBDataset") << "\nRow " << row << "\n";
     tup = getTuple(dataset, row + kNUMBER_HEADER_ROWS);
 
     // Loop over columns.
@@ -105,18 +94,13 @@ lariov::DBDataset::DBDataset(void* dataset, bool release) :
       if(fColTypes[col] == "integer" || fColTypes[col] == "bigint") {
 	long value = strtol(buf, 0, 10);
 	fData.push_back(value_type(value));
-	//mf::LogInfo("DBDataset") << "DBDataset: row=" << row << ", column=" << col << ", value=" << fData.back()
-	//	<< "\n";
 	if(col == 0) {
 	  fChannels.push_back(value);
-	  //mf::LogInfo("DBDataset") << "DBDataset: channel=" << fChannels.back() << "\n";
 	}
       }
       else if(fColTypes[col] == "real") {
 	double value = strtod(buf, 0);
 	fData.push_back(value_type(value));
-	//mf::LogInfo("DBDataset") << "DBDataset: row=" << row << ", column=" << col << ", value=" << fData.back()
-	//	<< "\n";
 	if(col == 0) {
 	  mf::LogError("DBDataset") << "First column has wrong type real." << "\n";
 	  throw cet::exception("DBDataset") << "First column has wrong type real.";
@@ -124,8 +108,6 @@ lariov::DBDataset::DBDataset(void* dataset, bool release) :
       }
       else if(fColTypes[col] == "text") {
 	fData.emplace_back(std::make_unique<std::string>(buf));
-	//mf::LogInfo("DBDataset") << "DBDataset: row=" << row << ", column=" << col << ", value=" << fData.back()
-	//	<< "\n";
 	if(col == 0) {
 	  mf::LogError("DBDataset") << "First column has wrong type text." << "\n";
 	  throw cet::exception("DBDataset") << "First column has wrong type text.";
@@ -144,8 +126,6 @@ lariov::DBDataset::DBDataset(void* dataset, bool release) :
 					    << "\n";
 	}
 	fData.push_back(value_type(value));
-	//mf::LogInfo("DBDataset") << "DBDataset: row=" << row << ", column=" << col << ", value=" << fData.back()
-	//	<< "\n";
 	if(col == 0) {
 	  mf::LogError("DBDataset") << "First column has wrong type boolean." << "\n";
 	  throw cet::exception("DBDataset") << "First column has wrong type boolean.";
