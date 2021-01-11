@@ -39,7 +39,7 @@ namespace lariov {
    * - *DefaultShapingTimeErr* (real, default: ): Shaping Time uncertainty returned
    *   when /UseDB/ and /UseFile/ parameters are false
    */
-  class SIOVElectronicsCalibProvider : public DatabaseRetrievalAlg, public ElectronicsCalibProvider {
+  class SIOVElectronicsCalibProvider : public ElectronicsCalibProvider {
 
     public:
 
@@ -64,8 +64,9 @@ namespace lariov {
 
       /// Do actual database updates.
 
-      bool DBUpdate() const;                    // Uses current event time.
       bool DBUpdate(DBTimeStamp_t ts) const;
+
+      DatabaseRetrievalAlg fRetrievalAlg;
 
       // Time stamps.
 
@@ -79,4 +80,3 @@ namespace lariov {
 }//end namespace lariov
 
 #endif
-

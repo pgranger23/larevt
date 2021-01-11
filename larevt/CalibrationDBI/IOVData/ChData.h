@@ -21,28 +21,18 @@ namespace lariov {
      \class ChData
   */
   class ChData {
-
     public:
-
-      /// Constructor
-      ChData(unsigned int ch) : fChannel(ch) {}
-
-      /// Default destructor
-      virtual ~ChData(){}
-
+      explicit ChData(unsigned int ch) : fChannel(ch) {}
       unsigned int Channel() const  { return fChannel; }
-      void SetChannel(unsigned int ch) { fChannel = ch; }
 
-      inline bool operator<(unsigned int rhs) const
+      bool operator<(unsigned int rhs) const
       { return fChannel < rhs;}
 
-      inline bool operator<(const ChData& ch) const
+      bool operator<(const ChData& ch) const
       { return fChannel < ch.Channel(); }
 
-    protected:
-
+    private:
       unsigned int fChannel;
-
   };
 }
 
@@ -51,12 +41,11 @@ namespace std {
   class less<lariov::ChData*>
   {
     public:
-      bool operator()( const lariov::ChData* lhs, const lariov::ChData* rhs )
-      { return (*lhs) < (*rhs); }
+      bool operator()( const lariov::ChData* lhs, const lariov::ChData* rhs ) const
+      { return *lhs < *rhs; }
   };
 }
 
 
 #endif
 /** @} */ // end of doxygen group
-

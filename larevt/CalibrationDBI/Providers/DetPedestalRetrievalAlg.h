@@ -53,14 +53,14 @@ namespace lariov {
    * - *DefaultRmsErr* (real, default: 0.0): error on the RMS value
    *   for all channels returned when /UseDB/ and /UseFile/ parameters are false
    */
-  class DetPedestalRetrievalAlg : public DatabaseRetrievalAlg, public DetPedestalProvider {
+  class DetPedestalRetrievalAlg : public DetPedestalProvider {
 
     public:
 
       /// Constructors
       DetPedestalRetrievalAlg(const std::string& foldername,
-      			      const std::string& url,
-			      const std::string& tag="");
+                              const std::string& url,
+                              const std::string& tag="");
 
       DetPedestalRetrievalAlg(fhicl::ParameterSet const& p);
 
@@ -88,8 +88,9 @@ namespace lariov {
 
       /// Do actual database updates.
 
-      bool DBUpdate() const;                    // Uses current event time.
       bool DBUpdate(DBTimeStamp_t ts) const;
+
+      DatabaseRetrievalAlg fRetrievalAlg;
 
       // Time stamps.
 

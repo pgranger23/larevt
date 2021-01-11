@@ -25,12 +25,11 @@ namespace lariov {
 
   //----------------------------------------------------------------------------
   SIOVChannelStatusProvider::SIOVChannelStatusProvider(fhicl::ParameterSet const& pset)
-    : DatabaseRetrievalAlg(pset.get<fhicl::ParameterSet>("DatabaseRetrievalAlg"))
+    : fRetrievalAlg(pset.get<fhicl::ParameterSet>("DatabaseRetrievalAlg"))
     , fEventTimeStamp(0)
     , fCurrentTimeStamp(0)
-    , fDefault(0)
+    , fDefault{0,kGOOD}
   {
-
     bool UseDB    = pset.get<bool>("UseDB", false);
     bool UseFile  = pset.get<bool>("UseFile", false);
     std::string fileName = pset.get<std::string>("FileName", "");
@@ -42,8 +41,7 @@ namespace lariov {
     else              fDataSource = DataSource::Default;
 
     if (fDataSource == DataSource::Default) {
-      std::cout << "Using default channel status value: "<<kGOOD<<"\n";
-      fDefault.SetStatus(kGOOD);
+      std::cout << "Using default channel status value: "<< fDefault.Status() <<"\n";
     }
     else if (fDataSource == DataSource::File) {
       cet::search_path sp("FW_SEARCH_PATH");
@@ -52,18 +50,15 @@ namespace lariov {
       std::ifstream file(abs_fp);
       if (!file) {
         throw cet::exception("SIOVChannelStatusProvider")
-	  << "File "<<abs_fp<<" is not found.";
+          << "File "<<abs_fp<<" is not found.";
       }
 
       std::string line;
-      ChannelStatus cs(0);
       while (std::getline(file, line)) {
-        DBChannelID_t ch = (DBChannelID_t)std::stoi(line.substr(0, line.find(',')));
-	int status = std::stoi(line.substr(line.find(',')+1));
-
-	cs.SetChannel(ch);
-	cs.SetStatus( ChannelStatus::GetStatusFromInt(status) );
-	fData.AddOrReplaceRow(cs);
+        DBChannelID_t ch = std::stoi(line.substr(0, line.find(',')));
+        int status = std::stoi(line.substr(line.find(',')+1));
+        ChannelStatus cs{ch, status};
+        fData.AddOrReplaceRow(cs);
       }
     } // if source from file
     else {
@@ -92,36 +87,28 @@ namespace lariov {
   // Maybe update method cached data (private const version).
   // This is the function that does the actual work of updating data from database.
 
-  bool SIOVChannelStatusProvider::DBUpdate(DBTimeStamp_t ts) const {
-
-    bool rc = false;
-    if(fDataSource == DataSource::Database && ts != fCurrentTimeStamp) {
-
-      mf::LogInfo("SIOVChannelStatusProvider") << "SIOVChannelStatusProvider::DBUpdate called with new timestamp.";
-
-      fCurrentTimeStamp = ts;
-
-      // Call non-const base class method.
-
-      auto result = GetDataset(ts);
-      if(result) {
-        rc = true;
-	//DBFolder was updated, so now update the Snapshot
-	fData.Clear();
-        fData.SetIoV(result->beginTime(), result->endTime());
-
-        for (auto const channel : fFolder.GetChannelList()) {
-
-          int status = fFolder.GetDataAsLong(channel, "status");
-
-          ChannelStatus cs(channel);
-          cs.SetStatus( ChannelStatus::GetStatusFromInt(status));
-
-	  fData.AddOrReplaceRow(cs);
-	}
-      }
+  bool SIOVChannelStatusProvider::DBUpdate(DBTimeStamp_t ts) const
+  {
+    if (fDataSource != DataSource::Database or ts == fCurrentTimeStamp) {
+      return false;
     }
-    return rc;
+
+    mf::LogInfo("SIOVChannelStatusProvider") << "SIOVChannelStatusProvider::DBUpdate called with new timestamp.";
+
+    fCurrentTimeStamp = ts;
+
+    auto const dataset = fRetrievalAlg.GetDataset(ts);
+
+    Snapshot<ChannelStatus> data{dataset.beginTime(), dataset.endTime()};
+
+    for (auto const channel : dataset.channels()) {
+      ChannelStatus cs{channel,
+                       static_cast<int>(dataset.GetDataAsLong(channel, "status"))};
+      data.AddOrReplaceRow(cs);
+    }
+
+    fData = data;
+    return true;
   }
 
 
@@ -134,9 +121,7 @@ namespace lariov {
     if (fNewNoisy.HasChannel(rawToDBChannel(ch))) {
       return fNewNoisy.GetRow(rawToDBChannel(ch));
     }
-    else {
-      return fData.GetRow(rawToDBChannel(ch));
-    }
+    return fData.GetRow(rawToDBChannel(ch));
   }
 
 
@@ -149,17 +134,17 @@ namespace lariov {
     DBChannelID_t maxChannel = art::ServiceHandle<geo::Geometry const>()->Nchannels() - 1;
     if (fDataSource == DataSource::Default) {
       if (fDefault.Status() == status) {
-	std::vector<DBChannelID_t> chs;
-	for (DBChannelID_t ch=0; ch != maxChannel; ++ch) {
-	  chs.push_back(ch);
-	}
-	retSet.insert(chs.begin(), chs.end());
+        std::vector<DBChannelID_t> chs;
+        for (DBChannelID_t ch=0; ch != maxChannel; ++ch) {
+          chs.push_back(ch);
+        }
+        retSet.insert(chs.begin(), chs.end());
       }
     }
     else {
       std::vector<DBChannelID_t> chs;
       for (DBChannelID_t ch=0; ch != maxChannel; ++ch) {
-	if (this->GetChannelStatus(ts, ch).Status() == status) chs.push_back(ch);
+        if (this->GetChannelStatus(ts, ch).Status() == status) chs.push_back(ch);
       }
 
       retSet.insert(chs.begin(), chs.end());
@@ -193,14 +178,11 @@ namespace lariov {
 
 
   //----------------------------------------------------------------------------
-  void SIOVChannelStatusProvider::AddNoisyChannel(DBTimeStamp_t ts, raw::ChannelID_t ch) {
-
-    // for c2: ISO C++17 does not allow 'register' storage class specifier
-    //register DBChannelID_t const dbch = rawToDBChannel(ch);
+  void SIOVChannelStatusProvider::AddNoisyChannel(DBTimeStamp_t ts, raw::ChannelID_t ch)
+  {
     DBChannelID_t const dbch = rawToDBChannel(ch);
-    if (!this->IsBad(ts, dbch) && this->IsPresent(ts, dbch)) {
-      ChannelStatus cs(dbch);
-      cs.SetStatus(kNOISY);
+    if (IsPresent(ts, dbch) and !IsBad(ts, dbch)) {
+      ChannelStatus cs{dbch, kNOISY};
       fNewNoisy.AddOrReplaceRow(cs);
     }
   }

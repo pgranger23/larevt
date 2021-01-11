@@ -28,11 +28,8 @@ namespace lariov {
       ///Constructor
       IOVTimeStamp(unsigned long stamp, unsigned int substamp = 0) :
         fStamp(stamp), fSubStamp(substamp) {
-	this->CalcDBStamp();
+        this->CalcDBStamp();
       }
-
-      ///Default destructor
-      virtual ~IOVTimeStamp(){}
 
       unsigned long Stamp() const { return fStamp; }
       unsigned long SubStamp() const { return fSubStamp; }
@@ -43,7 +40,7 @@ namespace lariov {
 
       /**
         This function combines the stamp and substamp into a unique string to be used
-	as a database timestamp.
+        as a database timestamp.
       */
       void CalcDBStamp();
 
@@ -74,5 +71,3 @@ namespace lariov {
   };
 }
 #endif
-
-

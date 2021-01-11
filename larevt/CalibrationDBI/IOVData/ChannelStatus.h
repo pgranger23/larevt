@@ -18,51 +18,71 @@
 
 namespace lariov {
 
-  enum chStatus {kDISCONNECTED=0, kDEAD=1, kLOWNOISE=2, kNOISY=3, kGOOD=4, kUNKNOWN=5};
+  enum chStatus {
+    kDISCONNECTED = 0,
+    kDEAD = 1,
+    kLOWNOISE = 2,
+    kNOISY = 3,
+    kGOOD = 4,
+    kUNKNOWN = 5
+  };
 
   /**
      \class ChannelStatus
   */
   class ChannelStatus : public ChData {
 
-    public:
+  public:
+    explicit ChannelStatus(unsigned int const ch, int const status)
+      : ChData(ch), fStatus{GetStatusFromInt(status)}
+    {}
 
-      /// Constructor
-      ChannelStatus(unsigned int ch) : ChData(ch) {}
+    bool
+    IsDead() const
+    {
+      return fStatus == kDEAD;
+    }
+    bool
+    IsLowNoise() const
+    {
+      return fStatus == kLOWNOISE;
+    }
+    bool
+    IsNoisy() const
+    {
+      return fStatus == kNOISY;
+    }
+    bool
+    IsPresent() const
+    {
+      return fStatus != kDISCONNECTED;
+    }
+    bool
+    IsGood() const
+    {
+      return fStatus == kGOOD;
+    }
+    chStatus
+    Status() const
+    {
+      return fStatus;
+    }
 
-      /// Default destructor
-      ~ChannelStatus() = default;
+    static chStatus
+    GetStatusFromInt(int status)
+    {
+      switch (status) {
+      case kDISCONNECTED: return kDISCONNECTED;
+      case kDEAD: return kDEAD;
+      case kLOWNOISE: return kLOWNOISE;
+      case kNOISY: return kNOISY;
+      case kGOOD: return kGOOD;
+      default: return kUNKNOWN;
+      };
+    }
 
-      bool IsDead()      const { return fStatus == kDEAD         ? true : false; }
-      bool IsLowNoise()  const { return fStatus == kLOWNOISE     ? true : false; }
-      bool IsNoisy()     const { return fStatus == kNOISY        ? true : false; }
-      bool IsPresent()   const { return fStatus == kDISCONNECTED ? false : true; }
-      bool IsGood()      const { return fStatus == kGOOD         ? true : false; }
-      chStatus Status()  const { return fStatus; }
-
-      void SetStatus(chStatus status) { fStatus = status; }
-
-      static chStatus GetStatusFromInt(int status) {
-	switch(status)
-	{
-	  case kDISCONNECTED : return kDISCONNECTED;
-	                       break;
-	  case kDEAD         : return kDEAD;
-	                       break;
-	  case kLOWNOISE     : return kLOWNOISE;
-	                       break;
-	  case kNOISY        : return kNOISY;
-	                       break;
-	  case kGOOD         : return kGOOD;
-	                       break;
-	  default            : return kUNKNOWN;
-	};
-
-	return kUNKNOWN;
-      }
-
-    private:
-      chStatus fStatus;
+  private:
+    chStatus fStatus;
   }; //end class
 } //end namespace lariov
 

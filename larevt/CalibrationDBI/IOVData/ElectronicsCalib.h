@@ -14,45 +14,59 @@
 #ifndef IOVDATA_ELECTRONICSCALIB_H
 #define IOVDATA_ELECTRONICSCALIB_H
 
-#include "ChData.h"
 #include "CalibrationExtraInfo.h"
+#include "ChData.h"
 
 namespace lariov {
   /**
      \class ElectronicsCalib
   */
   class ElectronicsCalib : public ChData {
+  public:
+    ElectronicsCalib(unsigned int ch,
+                     float const gain,
+                     float const gain_err,
+                     float const shaping_time,
+                     float const shaping_time_err)
+      : ChData(ch)
+      , fGain{gain}
+      , fGainErr{gain_err}
+      , fShapingTime{shaping_time}
+      , fShapingTimeErr{shaping_time_err}
+    {}
 
-    public:
+    float
+    Gain() const noexcept
+    {
+      return fGain;
+    }
+    float
+    GainErr() const noexcept
+    {
+      return fGainErr;
+    }
+    float
+    ShapingTime() const noexcept
+    {
+      return fShapingTime;
+    }
+    float
+    ShapingTimeErr() const noexcept
+    {
+      return fShapingTimeErr;
+    }
+    CalibrationExtraInfo const&
+    ExtraInfo() const noexcept
+    {
+      return fExtraInfo;
+    }
 
-      /// Constructor
-      ElectronicsCalib(unsigned int ch) :
-        ChData(ch),
-	fExtraInfo("ElectronicsCalib") {}
-
-      /// Default destructor
-      ~ElectronicsCalib() {}
-
-      float Gain()    const { return fGain; }
-      float GainErr() const { return fGainErr; }
-      float ShapingTime()    const { return fShapingTime; }
-      float ShapingTimeErr() const { return fShapingTimeErr; }
-      CalibrationExtraInfo const& ExtraInfo() const { return fExtraInfo; }
-
-      void SetGain(float v)    { fGain    = v; }
-      void SetGainErr(float v) { fGainErr = v; }
-      void SetShapingTime(float v)    { fShapingTime    = v; }
-      void SetShapingTimeErr(float v) { fShapingTimeErr = v; }
-      void SetExtraInfo(CalibrationExtraInfo const& info)
-      { fExtraInfo = info; }
-
-    private:
-
-      float fGain;
-      float fGainErr;
-      float fShapingTime;
-      float fShapingTimeErr;
-      CalibrationExtraInfo fExtraInfo;
+  private:
+    float fGain;
+    float fGainErr;
+    float fShapingTime;
+    float fShapingTimeErr;
+    CalibrationExtraInfo fExtraInfo{"ElectronicsCalib"};
 
   }; // end class
 } // end namespace lariov

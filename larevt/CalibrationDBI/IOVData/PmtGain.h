@@ -14,40 +14,41 @@
 #ifndef IOVDATA_PMTGAIN_H
 #define IOVDATA_PMTGAIN_H
 
-#include "ChData.h"
 #include "CalibrationExtraInfo.h"
+#include "ChData.h"
 
 namespace lariov {
   /**
      \class PmtGain
   */
   class PmtGain : public ChData {
+  public:
+    PmtGain(unsigned int const ch,
+            float const gain,
+            float const gain_err)
+      : ChData(ch), fGain{gain}, fGainErr{gain_err}
+    {}
 
-    public:
+    float
+    Gain() const noexcept
+    {
+      return fGain;
+    }
+    float
+    GainErr() const noexcept
+    {
+      return fGainErr;
+    }
+    CalibrationExtraInfo const&
+    ExtraInfo() const noexcept
+    {
+      return fExtraInfo;
+    }
 
-      /// Constructor
-      PmtGain(unsigned int ch) :
-        ChData(ch),
-	fExtraInfo("PmtGain") {}
-
-      /// Default destructor
-      ~PmtGain() {}
-
-      float Gain()    const { return fGain; }
-      float GainErr() const { return fGainErr; }
-      CalibrationExtraInfo const& ExtraInfo() const { return fExtraInfo; }
-
-      void SetGain(float v)    { fGain    = v; }
-      void SetGainErr(float v) { fGainErr = v; }
-      void SetExtraInfo(CalibrationExtraInfo const& info)
-      { fExtraInfo = info; }
-
-    private:
-
-      float fGain;
-      float fGainErr;
-      CalibrationExtraInfo fExtraInfo;
-
+  private:
+    float fGain;
+    float fGainErr;
+    CalibrationExtraInfo fExtraInfo{"PmtGain"};
   }; // end class
 } // end namespace lariov
 

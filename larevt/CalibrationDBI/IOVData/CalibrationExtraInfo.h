@@ -14,8 +14,6 @@ namespace lariov {
       CalibrationExtraInfo(std::string const& name) :
         fName(name) {}
 
-      virtual ~CalibrationExtraInfo() = default;
-
       //Get the name of the calibration
       std::string const& GetName() const
       { return fName; }

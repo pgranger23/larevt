@@ -18,6 +18,8 @@
 
 #include "fhiclcpp/fwd.h"
 
+#include <string>
+
 namespace lariov {
 
   class IOVTimeStamp;
@@ -28,35 +30,46 @@ namespace lariov {
      doxygen documentation!
   */
   class DatabaseRetrievalAlg {
+  public:
+    /// Constructors
+    DatabaseRetrievalAlg(const std::string& foldername,
+                         const std::string& url,
+                         const std::string& url2 = "",
+                         const std::string& tag = "",
+                         bool usesqlite = false,
+                         bool testmode = false)
+      : fFolder{foldername, url, url2, tag, usesqlite, testmode}
+    {}
 
-    public:
+    explicit DatabaseRetrievalAlg(fhicl::ParameterSet const& p);
 
-      /// Constructors
-      DatabaseRetrievalAlg(const std::string& foldername, const std::string& url,
-			   const std::string& url2="", const std::string& tag="",
-			   bool usesqlite=false, bool testmode=false) :
-        fFolder{foldername, url, url2, tag, usesqlite, testmode}{}
+    DBDataset
+    GetDataset(DBTimeStamp_t ts) const
+    {
+      return fFolder.GetDataset(ts);
+    }
 
-      explicit DatabaseRetrievalAlg(fhicl::ParameterSet const& p);
+    /// Get connection information
+    const std::string&
+    URL() const
+    {
+      return fFolder.URL();
+    }
+    const std::string&
+    FolderName() const
+    {
+      return fFolder.FolderName();
+    }
+    const std::string&
+    Tag() const
+    {
+      return fFolder.Tag();
+    }
 
-
-      /// Return true if fFolder is successfully updated
-      std::optional<DBDataset>
-      GetDataset(DBTimeStamp_t ts) const {
-        return fFolder.GetDataset(ts);
-      }
-
-      /// Get connection information
-      const std::string& URL() const {return fFolder.URL();}
-      const std::string& FolderName() const {return fFolder.FolderName();}
-      const std::string& Tag() const {return fFolder.Tag();}
-
-    protected:
-      DBFolder fFolder;
-
+  private:
+    DBFolder fFolder;
   };
 }
-
 
 #endif
 /** @} */ // end of doxygen group

@@ -17,7 +17,7 @@ namespace lariov {
   // Constructor.
 
   DBFolder::DBFolder(const std::string& name, const std::string& url, const std::string& url2,
-		     const std::string& tag, bool usesqlite, bool testmode)
+                     const std::string& tag, bool usesqlite, bool testmode)
   {
     fFolderName = name;
     fURL = url;
@@ -55,72 +55,13 @@ namespace lariov {
     }
   }
 
-
-  // Data accessors.
-
-  bool DBFolder::GetDataAsBool(DBChannelID_t channel, const std::string& name) const
-  {
-
-    auto const row = fDataset.getRowForChannel(channel);
-    size_t col = GetColumn(name);
-    long value = row.getLongData(col);
-    return value != 0;
-  }
-
-  long DBFolder::GetDataAsLong(DBChannelID_t channel, const std::string& name) const
-  {
-    auto const row = fDataset.getRowForChannel(channel);
-    size_t col = GetColumn(name);
-    return row.getLongData(col);
-  }
-
-  double DBFolder::GetDataAsDouble(DBChannelID_t channel, const std::string& name) const
-  {
-    auto const row = fDataset.getRowForChannel(channel);
-    size_t col = GetColumn(name);
-    return row.getDoubleData(col);
-  }
-
-  std::string DBFolder::GetDataAsString(DBChannelID_t channel, const std::string& name) const
-  {
-    auto const row = fDataset.getRowForChannel(channel);
-    size_t col = GetColumn(name);
-    return row.getStringData(col);
-  }
-
-
-  std::vector<DBChannelID_t> const& DBFolder::GetChannelList() const
-  {
-    return fDataset.channels();
-  }
-
-  // Find matching column.
-
-  size_t DBFolder::GetColumn(const std::string& name) const
-  {
-    int col = fDataset.getColNumber(name);
-
-    // See if we found a matching column.
-
-    if(col < 0) {
-      std::string msg = "Column " + name + " is not found in database!";
-      throw WebError(msg);
-    }
-
-    return col;
-  }
-
   //returns true if an Update is performed, false if not
-  std::optional<DBDataset>
+  DBDataset
   DBFolder::GetDataset( DBTimeStamp_t raw_time) const {
 
     //convert to IOVTimeStamp
     IOVTimeStamp ts = TimeStampDecoder::DecodeTimeStamp(raw_time);
 
-    //check if cache is updated
-    if (fDataset.IsValid(ts)) return std::nullopt;
-
-    //release cached data.
     DBDataset dbdataset;
 
     //get full url string
@@ -135,16 +76,16 @@ namespace lariov {
     }
     else {
       if(fTestMode) {
-	mf::LogInfo log("DBFolder");
-	log << "Accessing primary calibration data from http conditions database server." << "\n";
-	log << "Folder = " << fFolderName << "\n";
+        mf::LogInfo log("DBFolder");
+        log << "Accessing primary calibration data from http conditions database server." << "\n";
+        log << "Folder = " << fFolderName << "\n";
       }
       int err = 0;
       Dataset data = getDataWithTimeout(fullurl.str().c_str(), NULL, fMaximumTimeout, &err);
       int status = getHTTPstatus(data);
       if (status != 200) {
-	std::string msg = "HTTP error from " + fullurl.str()+": status: " + std::to_string(status) + ": " + std::string(getHTTPmessage(data));
-	throw WebError(msg);
+        std::string msg = "HTTP error from " + fullurl.str()+": status: " + std::to_string(status) + ": " + std::string(getHTTPmessage(data));
+        throw WebError(msg);
       }
       dbdataset = DBDataset(data, true);
     }
@@ -154,30 +95,30 @@ namespace lariov {
 
     if(fTestMode) {
       if(fSQLitePath != "") {
-	DBDataset compare1;
-	mf::LogInfo("DBFolder") << "Accessing comparison data from sqlite database " << fSQLitePath << "\n";
-	GetSQLiteData(raw_time/1000000000, compare1);
-	CompareDataset(dbdataset, compare1);
+        DBDataset compare1;
+        mf::LogInfo("DBFolder") << "Accessing comparison data from sqlite database " << fSQLitePath << "\n";
+        GetSQLiteData(raw_time/1000000000, compare1);
+        CompareDataset(dbdataset, compare1);
       }
       if(fURL2 != "") {
-	mf::LogInfo("DBFolder") <<"Accessing comparison data from second database url." << "\n";
-	std::stringstream fullurl2;
-	fullurl2 << fURL2 << "/data?f=" << fFolderName
-		 << "&t=" << ts.DBStamp();
-	if (fTag.length() > 0) fullurl2 << "&tag=" << fTag;
-	mf::LogInfo("DBFolder") << "Full url = " << fullurl2.str() << "\n";
-	int err = 0;
-	Dataset data = getDataWithTimeout(fullurl2.str().c_str(), NULL, fMaximumTimeout, &err);
-	int status = getHTTPstatus(data);
-	if (status != 200) {
-	  std::string msg = "HTTP error from " + fullurl2.str()+": status: " + std::to_string(status) + ": " + std::string(getHTTPmessage(data));
-	  throw WebError(msg);
-	}
-	DBDataset compare2(data, true);
-	CompareDataset(dbdataset, compare2);
+        mf::LogInfo("DBFolder") <<"Accessing comparison data from second database url." << "\n";
+        std::stringstream fullurl2;
+        fullurl2 << fURL2 << "/data?f=" << fFolderName
+                 << "&t=" << ts.DBStamp();
+        if (fTag.length() > 0) fullurl2 << "&tag=" << fTag;
+        mf::LogInfo("DBFolder") << "Full url = " << fullurl2.str() << "\n";
+        int err = 0;
+        Dataset data = getDataWithTimeout(fullurl2.str().c_str(), NULL, fMaximumTimeout, &err);
+        int status = getHTTPstatus(data);
+        if (status != 200) {
+          std::string msg = "HTTP error from " + fullurl2.str()+": status: " + std::to_string(status) + ": " + std::string(getHTTPmessage(data));
+          throw WebError(msg);
+        }
+        DBDataset compare2(data, true);
+        CompareDataset(dbdataset, compare2);
       }
     }
-    return std::make_optional(std::move(dbdataset));
+    return dbdataset;
   }
 
   // Query data from sqlite database.
@@ -213,11 +154,11 @@ namespace lariov {
     std::string table_tag_iovs = fFolderName + "_tag_iovs";
     std::ostringstream sql;
     sql << "SELECT " << table_iovs << ".iov_id," << table_iovs << ".begin_time"
-	<< " FROM " << table_tag_iovs << "," << table_iovs
-	<< " WHERE " << table_tag_iovs << ".tag='" << fTag << "'"
-	<< " AND " << table_tag_iovs << ".iov_id=" << table_iovs << ".iov_id"
-	<< " AND " << table_iovs << ".begin_time <= " << t
-	<< " ORDER BY " << table_iovs << ".begin_time desc";
+        << " FROM " << table_tag_iovs << "," << table_iovs
+        << " WHERE " << table_tag_iovs << ".tag='" << fTag << "'"
+        << " AND " << table_tag_iovs << ".iov_id=" << table_iovs << ".iov_id"
+        << " AND " << table_iovs << ".begin_time <= " << t
+        << " ORDER BY " << table_iovs << ".begin_time desc";
 
     // Prepare query.
 
@@ -252,11 +193,11 @@ namespace lariov {
 
     sql.str("");
     sql << "SELECT " << table_iovs << ".begin_time"
-	<< " FROM " << table_tag_iovs << "," << table_iovs
-	<< " WHERE " << table_tag_iovs << ".tag='" << fTag << "'"
-	<< " AND " << table_tag_iovs << ".iov_id=" << table_iovs << ".iov_id"
-	<< " AND " << table_iovs << ".begin_time > " << t
-	<< " ORDER BY " << table_iovs << ".begin_time";
+        << " FROM " << table_tag_iovs << "," << table_iovs
+        << " WHERE " << table_tag_iovs << ".tag='" << fTag << "'"
+        << " AND " << table_tag_iovs << ".iov_id=" << table_iovs << ".iov_id"
+        << " AND " << table_iovs << ".begin_time > " << t
+        << " ORDER BY " << table_iovs << ".begin_time";
 
     // Prepare query.
 
@@ -292,11 +233,11 @@ namespace lariov {
     std::string table_data = fFolderName + "_data";
     sql.str("");
     sql << "SELECT COUNT(DISTINCT channel)"
-	<< " FROM " << table_data << "," << table_iovs << "," << table_tag_iovs
-	<< " WHERE " << table_tag_iovs << ".tag='" << fTag << "'"
-	<< " AND " << table_iovs << ".iov_id=" << table_tag_iovs << ".iov_id"
-	<< " AND " << table_data << ".__iov_id=" << table_tag_iovs << ".iov_id"
-	<< " AND " << table_iovs << ".begin_time <= " << t;
+        << " FROM " << table_data << "," << table_iovs << "," << table_tag_iovs
+        << " WHERE " << table_tag_iovs << ".tag='" << fTag << "'"
+        << " AND " << table_iovs << ".iov_id=" << table_tag_iovs << ".iov_id"
+        << " AND " << table_data << ".__iov_id=" << table_tag_iovs << ".iov_id"
+        << " AND " << table_iovs << ".begin_time <= " << t;
 
     // Prepare query.
 
@@ -345,13 +286,13 @@ namespace lariov {
 
     sql.str("");
     sql << "SELECT " << table_data << ".*,MAX(begin_time)"
-	<< " FROM " << table_data << "," << table_iovs << "," << table_tag_iovs
-	<< " WHERE " << table_tag_iovs << ".tag='" << fTag << "'"
-	<< " AND " << table_iovs << ".iov_id=" << table_tag_iovs << ".iov_id"
-	<< " AND " << table_data << ".__iov_id=" << table_tag_iovs << ".iov_id"
-	<< " AND " << table_iovs << ".begin_time <= " << t
-	<< " GROUP BY channel"
-	<< " ORDER BY channel";
+        << " FROM " << table_data << "," << table_iovs << "," << table_tag_iovs
+        << " WHERE " << table_tag_iovs << ".tag='" << fTag << "'"
+        << " AND " << table_iovs << ".iov_id=" << table_tag_iovs << ".iov_id"
+        << " AND " << table_data << ".__iov_id=" << table_tag_iovs << ".iov_id"
+        << " AND " << table_iovs << ".begin_time <= " << t
+        << " GROUP BY channel"
+        << " ORDER BY channel";
 
     // Prepare query.
 
@@ -376,27 +317,27 @@ namespace lariov {
       // Loop over columns.
 
       for(int col = 0; col < ncols; ++col) {
-	std::string colname = sqlite3_column_name(stmt, col);
+        std::string colname = sqlite3_column_name(stmt, col);
 
-	// Ignore columns that begin with "_".
-	// Also ignore utility column MAX(begin_time).
+        // Ignore columns that begin with "_".
+        // Also ignore utility column MAX(begin_time).
 
-	if(colname[0] != '_' && colname.substr(0,3) != "MAX") {
-	  column_names.push_back(colname);
-	  int dtype = sqlite3_column_type(stmt, col);
-	  if(dtype == SQLITE_INTEGER)
-	    column_types.push_back("integer");
-	  else if(dtype == SQLITE_FLOAT)
-	    column_types.push_back("real");
-	  else if(dtype == SQLITE_TEXT)
-	    column_types.push_back("text");
-	  else if(dtype == SQLITE_NULL)
-	    column_types.push_back("NULL");
-	  else {
-	    mf::LogError("DBFolder") << "Unknown type " << dtype << "\n";
-	    throw cet::exception("DBFolder") << "Unknown type " << dtype;
-	  }
-	}
+        if(colname[0] != '_' && colname.substr(0,3) != "MAX") {
+          column_names.push_back(colname);
+          int dtype = sqlite3_column_type(stmt, col);
+          if(dtype == SQLITE_INTEGER)
+            column_types.push_back("integer");
+          else if(dtype == SQLITE_FLOAT)
+            column_types.push_back("real");
+          else if(dtype == SQLITE_TEXT)
+            column_types.push_back("text");
+          else if(dtype == SQLITE_NULL)
+            column_types.push_back("NULL");
+          else {
+            mf::LogError("DBFolder") << "Unknown type " << dtype << "\n";
+            throw cet::exception("DBFolder") << "Unknown type " << dtype;
+          }
+        }
       }
     }
     else {
@@ -421,66 +362,66 @@ namespace lariov {
     while(rc != SQLITE_DONE) {
       rc = sqlite3_step(stmt);
       if(rc == SQLITE_ROW) {
-	++irow;
-	if(irow > nrows) {
-	  mf::LogError("DBFolder") << "Too many data rows " << irow << "\n";
-	  throw cet::exception("DBFolder") << "Too many data rows " << irow;
-	}
+        ++irow;
+        if(irow > nrows) {
+          mf::LogError("DBFolder") << "Too many data rows " << irow << "\n";
+          throw cet::exception("DBFolder") << "Too many data rows " << irow;
+        }
 
-	// Loop over columns.
-	// Remember that ncols is the number of columns returned by the query,
-	// not the number of columns that get stored (some columns are ignored).
+        // Loop over columns.
+        // Remember that ncols is the number of columns returned by the query,
+        // not the number of columns that get stored (some columns are ignored).
 
-	bool firstcol = true;
-	for(int col = 0; col < ncols; ++col) {
-	  std::string colname = sqlite3_column_name(stmt, col);
+        bool firstcol = true;
+        for(int col = 0; col < ncols; ++col) {
+          std::string colname = sqlite3_column_name(stmt, col);
 
-	  // Ignore columns that begin with "_".
-	  // Also ignore utility column MAX(begin_time).
+          // Ignore columns that begin with "_".
+          // Also ignore utility column MAX(begin_time).
 
-	  if(colname[0] != '_' && colname.substr(0,3) != "MAX") {
-	    int dtype = sqlite3_column_type(stmt, col);
+          if(colname[0] != '_' && colname.substr(0,3) != "MAX") {
+            int dtype = sqlite3_column_type(stmt, col);
 
-	    if(dtype == SQLITE_INTEGER) {
-	      long value = sqlite3_column_int(stmt, col);
-	      values.push_back(DBDataset::value_type(value));
-	      if(firstcol)
-		channels.push_back(value);
-	    }
-	    else if(dtype == SQLITE_FLOAT) {
-	      double value = sqlite3_column_double(stmt, col);
-	      values.push_back(DBDataset::value_type(value));
-	      if(firstcol) {
-		mf::LogError("DBFolder") << "First column has wrong type float." << "\n";
-		throw cet::exception("DBFolder") << "First column has wrong type float.";
-	      }
-	    }
-	    else if(dtype == SQLITE_TEXT) {
-	      const char* s = (const char*)sqlite3_column_text(stmt, col);
-	      values.emplace_back(std::make_unique<std::string>(s));
-	      if(firstcol) {
-		mf::LogError("DBFolder") << "First column has wrong type text." << "\n";
-		throw cet::exception("DBFolder") << "First column has wrong type text.";
-	      }
-	    }
-	    else if(dtype == SQLITE_NULL) {
-	      values.push_back(DBDataset::value_type());
-	      if(firstcol) {
-		mf::LogError("DBFolder") << "First column has wrong type null." << "\n";
-		throw cet::exception("DBFolder") << "First column has wrong type null.";
-	      }
-	    }
-	    else {
-	      mf::LogError("DBFolder") << "Unrecognized sqlite data type" << "\n";
-	      throw cet::exception("DBFolder") << "Unrecognized sqlite data type.";
-	    }
-	    firstcol = false;
-	  }
-	}
+            if(dtype == SQLITE_INTEGER) {
+              long value = sqlite3_column_int(stmt, col);
+              values.push_back(DBDataset::value_type(value));
+              if(firstcol)
+                channels.push_back(value);
+            }
+            else if(dtype == SQLITE_FLOAT) {
+              double value = sqlite3_column_double(stmt, col);
+              values.push_back(DBDataset::value_type(value));
+              if(firstcol) {
+                mf::LogError("DBFolder") << "First column has wrong type float." << "\n";
+                throw cet::exception("DBFolder") << "First column has wrong type float.";
+              }
+            }
+            else if(dtype == SQLITE_TEXT) {
+              const char* s = (const char*)sqlite3_column_text(stmt, col);
+              values.emplace_back(std::make_unique<std::string>(s));
+              if(firstcol) {
+                mf::LogError("DBFolder") << "First column has wrong type text." << "\n";
+                throw cet::exception("DBFolder") << "First column has wrong type text.";
+              }
+            }
+            else if(dtype == SQLITE_NULL) {
+              values.push_back(DBDataset::value_type());
+              if(firstcol) {
+                mf::LogError("DBFolder") << "First column has wrong type null." << "\n";
+                throw cet::exception("DBFolder") << "First column has wrong type null.";
+              }
+            }
+            else {
+              mf::LogError("DBFolder") << "Unrecognized sqlite data type" << "\n";
+              throw cet::exception("DBFolder") << "Unrecognized sqlite data type.";
+            }
+            firstcol = false;
+          }
+        }
       }
       else if(rc != SQLITE_DONE) {
-	mf::LogError("DBFolder") << "sqlite3_step returned error result = " << rc << "\n";
-	throw cet::exception("DBFolder") << "sqlite3_step error.";
+        mf::LogError("DBFolder") << "sqlite3_step returned error result = " << rc << "\n";
+        throw cet::exception("DBFolder") << "sqlite3_step error.";
       }
     }
     if(irow != nrows) {
@@ -489,9 +430,9 @@ namespace lariov {
     }
     if(values.size() != nrows * nrelcols) {
       mf::LogError("DBFolder") << "Wrong number of values "
-			       << values.size() << "," << nrows << "," << nrelcols << "\n";
+                               << values.size() << "," << nrows << "," << nrelcols << "\n";
       throw cet::exception("DBFolder") << "Wrong number of values "
-				       << values.size() << "," << nrows << "," << nrelcols << "\n";
+                                       << values.size() << "," << nrows << "," << nrelcols << "\n";
     }
 
     // Delete statement.
@@ -505,10 +446,10 @@ namespace lariov {
     // Fill result.
 
     data = DBDataset(begin_ts, end_ts,
-		     std::move(column_names),
-		     std::move(column_types),
-		     std::move(channels),
-		     std::move(values));
+                     std::move(column_names),
+                     std::move(column_types),
+                     std::move(channels),
+                     std::move(values));
 
     // Done.
 
@@ -553,22 +494,22 @@ namespace lariov {
       // Loop over columns.
 
       for(size_t col=0; col<ncols; ++col) {
-	if(types[col] == "bigint" || types[col] == "integer" || types[col] == "boolean") {
-	  long value = dbrow.getLongData(col);
-	  log << names[col] << " = " << value << "\n";
-	}
-	else if(types[col] == "real") {
-	  double value = dbrow.getDoubleData(col);
-	  log << names[col] << " = " << value << "\n";
-	}
-	else if(types[col] == "text" or types[col] == "boolean") {
-	  std::string value = dbrow.getStringData(col);
-	  log << names[col] << " = " << value << "\n";
-	}
-	else {
-	  mf::LogError("DBFolder") << "Unknown type " << types[col] << "\n";
-	  throw cet::exception("DBFolder") << "Unknown type.";
-	}
+        if(types[col] == "bigint" || types[col] == "integer" || types[col] == "boolean") {
+          long value = dbrow.getLongData(col);
+          log << names[col] << " = " << value << "\n";
+        }
+        else if(types[col] == "real") {
+          double value = dbrow.getDoubleData(col);
+          log << names[col] << " = " << value << "\n";
+        }
+        else if(types[col] == "text" or types[col] == "boolean") {
+          std::string value = dbrow.getStringData(col);
+          log << names[col] << " = " << value << "\n";
+        }
+        else {
+          mf::LogError("DBFolder") << "Unknown type " << types[col] << "\n";
+          throw cet::exception("DBFolder") << "Unknown type.";
+        }
       }
     }
   }
@@ -605,18 +546,18 @@ namespace lariov {
     const std::vector<std::string>& names2 = data2.colNames();
     if(ncols1 != ncols2 || ncols1 != names1.size() || ncols2 != names2.size()) {
       mf::LogWarning("DBFolder") << "Columns names size mismatch " << ncols1
-				 << " vs. " << ncols2
-				 << " vs. " << names1.size()
-				 << " vs. " << names2.size()
-				 << "\n";
+                                 << " vs. " << ncols2
+                                 << " vs. " << names1.size()
+                                 << " vs. " << names2.size()
+                                 << "\n";
       compare_ok = false;
     }
     if(compare_ok) {
       for (size_t c=0; c<ncols1; ++c) {
-	if(names1[c] != names2[c]) {
-	  mf::LogWarning("DBFolder") << "Name mismatch " << names1[c] << " vs. " << names2[c] << "\n";
-	  compare_ok = false;
-	}
+        if(names1[c] != names2[c]) {
+          mf::LogWarning("DBFolder") << "Name mismatch " << names1[c] << " vs. " << names2[c] << "\n";
+          compare_ok = false;
+        }
       }
     }
 
@@ -626,28 +567,28 @@ namespace lariov {
     const std::vector<std::string>& types2 = data2.colTypes();
     if(ncols1 != ncols2 || ncols1 != types1.size() || ncols2 != types2.size()) {
       mf::LogWarning("DBFolder") << "Column types ize mismatch " << ncols1
-				 << " vs. " << ncols2
-				 << " vs. " << types1.size()
-				 << " vs. " << types2.size()
-				 << "\n";
+                                 << " vs. " << ncols2
+                                 << " vs. " << types1.size()
+                                 << " vs. " << types2.size()
+                                 << "\n";
       compare_ok = false;
     }
     if(compare_ok) {
       for (size_t c=0; c<ncols2; ++c) {
 
-	// Type "bigint" matches "integer."
-	// Type "boolean" matches "integer."
+        // Type "bigint" matches "integer."
+        // Type "boolean" matches "integer."
 
-	std::string type1 = types1[c];
-	std::string type2 = types2[c];
-	if(type1 == "bigint" || type1 == "boolean")
-	  type1 = "integer";
-	if(type2 == "bigint" || type2 == "boolean")
-	  type2 = "integer";
-	if(type1 != type2) {
-	  mf::LogWarning("DBFolder") << "Type mismatch " << type1 << " vs. " << type2 << "\n";
-	  compare_ok = false;
-	}
+        std::string type1 = types1[c];
+        std::string type2 = types2[c];
+        if(type1 == "bigint" || type1 == "boolean")
+          type1 = "integer";
+        if(type2 == "bigint" || type2 == "boolean")
+          type2 = "integer";
+        if(type1 != type2) {
+          mf::LogWarning("DBFolder") << "Type mismatch " << type1 << " vs. " << type2 << "\n";
+          compare_ok = false;
+        }
       }
     }
 
@@ -657,18 +598,18 @@ namespace lariov {
     const std::vector<DBChannelID_t>& channels2 = data2.channels();
     if(nrows1 != nrows2 || nrows1 != channels1.size() || nrows2 != channels2.size()) {
       mf::LogWarning("DBFolder") << "Channels size mismatch " << nrows1
-				 << " vs. " << nrows2
-				 << " vs. " << channels1.size()
-				 << " vs. " << channels2.size()
-				 << "\n";
+                                 << " vs. " << nrows2
+                                 << " vs. " << channels1.size()
+                                 << " vs. " << channels2.size()
+                                 << "\n";
       compare_ok = false;
     }
     if(compare_ok) {
       for (size_t r=0; r<nrows1; ++r) {
-	if(channels1[r] != channels2[r]) {
-	  mf::LogWarning("DBFolder") << "Channel mismatch " << channels1[r] << " vs. " << channels2[r] << "\n";
-	  compare_ok = false;
-	}
+        if(channels1[r] != channels2[r]) {
+          mf::LogWarning("DBFolder") << "Channel mismatch " << channels1[r] << " vs. " << channels2[r] << "\n";
+          compare_ok = false;
+        }
       }
     }
 
@@ -676,8 +617,8 @@ namespace lariov {
 
     if(data1.data().size() != data2.data().size()) {
       mf::LogWarning("DBFolder") << "Values size mismatch " << data1.data().size()
-				 << " vs. " << data2.data().size()
-				 << "\n";
+                                 << " vs. " << data2.data().size()
+                                 << "\n";
       compare_ok = false;
     }
 
@@ -685,41 +626,41 @@ namespace lariov {
     if(compare_ok) {
       for(size_t row=0; row<nrows1; ++row) {
 
-	DBDataset::DBRow dbrow1 = data1.getRow(row);
-	DBDataset::DBRow dbrow2 = data2.getRow(row);
+        DBDataset::DBRow dbrow1 = data1.getRow(row);
+        DBDataset::DBRow dbrow2 = data2.getRow(row);
 
-	// Loop over columns.
+        // Loop over columns.
 
-	for(size_t col=0; col<ncols1; ++col) {
-	  if(types1[col] == "integer" || types1[col] == "bigint" ||  types1[col] == "boolean") {
-	    long value1 = dbrow1.getLongData(col);
-	    long value2 = dbrow2.getLongData(col);
-	    if(value1 != value2) {
-	      mf::LogWarning("DBFolder") << "Value mismatch " << value1 << " vs. " << value2 << "\n";
-	      compare_ok = false;
-	    }
-	  }
-	  else if(types1[col] == "real") {
-	    double value1 = dbrow1.getDoubleData( col);
-	    double value2 = dbrow2.getDoubleData( col);
-	    if(value1 != value2) {
-	      mf::LogWarning("DBFolder") << "Value mismatch " << value1 << " vs. " << value2 << "\n";
-	      compare_ok = false;
-	    }
-	  }
-	  else if(types1[col] == "text") {
-	    std::string value1 = dbrow2.getStringData(col);
-	    std::string value2 = dbrow2.getStringData(col);
-	    if(value1 != value2) {
-	      mf::LogWarning("DBFolder") << "Value mismatch " << value1 << " vs. " << value2 << "\n";
-	      compare_ok = false;
-	    }
-	  }
-	  else {
-	    mf::LogError("DBFolder") << "Unknown type " << types1[col] << "\n";
-	    throw cet::exception("DBFolder") << "Unknown type.";
-	  }
-	}
+        for(size_t col=0; col<ncols1; ++col) {
+          if(types1[col] == "integer" || types1[col] == "bigint" ||  types1[col] == "boolean") {
+            long value1 = dbrow1.getLongData(col);
+            long value2 = dbrow2.getLongData(col);
+            if(value1 != value2) {
+              mf::LogWarning("DBFolder") << "Value mismatch " << value1 << " vs. " << value2 << "\n";
+              compare_ok = false;
+            }
+          }
+          else if(types1[col] == "real") {
+            double value1 = dbrow1.getDoubleData( col);
+            double value2 = dbrow2.getDoubleData( col);
+            if(value1 != value2) {
+              mf::LogWarning("DBFolder") << "Value mismatch " << value1 << " vs. " << value2 << "\n";
+              compare_ok = false;
+            }
+          }
+          else if(types1[col] == "text") {
+            std::string value1 = dbrow2.getStringData(col);
+            std::string value2 = dbrow2.getStringData(col);
+            if(value1 != value2) {
+              mf::LogWarning("DBFolder") << "Value mismatch " << value1 << " vs. " << value2 << "\n";
+              compare_ok = false;
+            }
+          }
+          else {
+            mf::LogError("DBFolder") << "Unknown type " << types1[col] << "\n";
+            throw cet::exception("DBFolder") << "Unknown type.";
+          }
+        }
       }
     }
 

@@ -35,7 +35,7 @@ namespace lariov {
    * - *DefaultGainErr* (real, default: ): Gain uncertainty returned
    *   when /UseDB/ and /UseFile/ parameters are false
    */
-  class SIOVPmtGainProvider : public DatabaseRetrievalAlg, public PmtGainProvider {
+  class SIOVPmtGainProvider : public PmtGainProvider {
 
     public:
 
@@ -58,8 +58,9 @@ namespace lariov {
 
       /// Do actual database updates.
 
-      bool DBUpdate() const;                    // Uses current event time.
       bool DBUpdate(DBTimeStamp_t ts) const;
+
+      DatabaseRetrievalAlg fRetrievalAlg;
 
       // Time stamps.
 
@@ -73,4 +74,3 @@ namespace lariov {
 }//end namespace lariov
 
 #endif
-

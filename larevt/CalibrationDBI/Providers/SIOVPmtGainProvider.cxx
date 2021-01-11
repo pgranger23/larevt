@@ -11,10 +11,10 @@ namespace lariov {
 
   //constructor
   SIOVPmtGainProvider::SIOVPmtGainProvider(fhicl::ParameterSet const& p) :
-    DatabaseRetrievalAlg(p.get<fhicl::ParameterSet>("DatabaseRetrievalAlg")),
+    fRetrievalAlg(p.get<fhicl::ParameterSet>("DatabaseRetrievalAlg")),
     fEventTimeStamp(0),
-    fCurrentTimeStamp(0) {
-    fData.Clear();
+    fCurrentTimeStamp(0)
+  {
     IOVTimeStamp tmp = IOVTimeStamp::MaxTimeStamp();
     tmp.SetStamp(tmp.Stamp()-1, tmp.SubStamp());
     fData.SetIoV(tmp, IOVTimeStamp::MaxTimeStamp());
@@ -30,21 +30,17 @@ namespace lariov {
     else              fDataSource = DataSource::Default;
 
     if (fDataSource == DataSource::Default) {
-      float default_gain     = p.get<float>("DefaultGain");
-      float default_gain_err = p.get<float>("DefaultGainErr");
+      auto const default_gain     = p.get<float>("DefaultGain");
+      auto const default_gain_err = p.get<float>("DefaultGainErr");
 
-      PmtGain defaultGain(0);
-
-      defaultGain.SetGain(default_gain);
-      defaultGain.SetGainErr(default_gain_err);
-      defaultGain.SetExtraInfo(CalibrationExtraInfo("PmtGain"));
-
-      art::ServiceHandle<geo::Geometry const> geo;
+      art::ServiceHandle<geo::Geometry const> geo; // FIXME: Cannot use services in providers
       for (unsigned int od=0; od!=geo->NOpDets(); ++od) {
         if (geo->IsValidOpChannel(od)) {
-	  defaultGain.SetChannel(od);
-	  fData.AddOrReplaceRow(defaultGain);
-	}
+          PmtGain defaultGain{od,
+                              default_gain,
+                              default_gain_err};
+          fData.AddOrReplaceRow(defaultGain);
+        }
       }
 
     }
@@ -59,7 +55,6 @@ namespace lariov {
       }
 
       std::string line;
-      PmtGain dp(0);
       while (std::getline(file, line)) {
         if (line[0] == '#') continue;
         size_t current_comma = line.find(',');
@@ -69,13 +64,7 @@ namespace lariov {
         current_comma = line.find(',',current_comma+1);
         float gain_err = std::stof( line.substr(current_comma+1) );
 
-        CalibrationExtraInfo info("PmtGain");
-
-        dp.SetChannel(ch);
-        dp.SetGain(gain);
-        dp.SetGainErr(gain_err);
-	dp.SetExtraInfo(info);
-
+        PmtGain dp{ch, gain, gain_err};
         fData.AddOrReplaceRow(dp);
       }
     }
@@ -86,77 +75,62 @@ namespace lariov {
 
   // This method saves the time stamp of the latest event.
 
-  void SIOVPmtGainProvider::UpdateTimeStamp(DBTimeStamp_t ts) {
+  void SIOVPmtGainProvider::UpdateTimeStamp(DBTimeStamp_t ts)
+  {
     mf::LogInfo("SIOVPmtGainProvider") << "SIOVPmtGainProvider::UpdateTimeStamp called.";
     fEventTimeStamp = ts;
   }
 
   // Maybe update method cached data (public non-const version).
 
-  bool SIOVPmtGainProvider::Update(DBTimeStamp_t ts) {
-
+  bool SIOVPmtGainProvider::Update(DBTimeStamp_t ts)
+  {
     fEventTimeStamp = ts;
     return DBUpdate(ts);
-  }
-
-  // Maybe update method cached data (private const version using current event time).
-
-  bool SIOVPmtGainProvider::DBUpdate() const {
-    return DBUpdate(fEventTimeStamp);
   }
 
   // Maybe update method cached data (private const version).
   // This is the function that does the actual work of updating data from database.
 
-  bool SIOVPmtGainProvider::DBUpdate(DBTimeStamp_t ts) const {
-
-    bool rc = false;
-    if (fDataSource == DataSource::Database && ts != fCurrentTimeStamp) {
-
-      mf::LogInfo("SIOVPmtGainProvider") << "SIOVPmtGainProvider::DBUpdate called with new timestamp.";
-
-      fCurrentTimeStamp = ts;
-
-      auto result = GetDataset(ts);
-      if(result) {
-        rc = true;
-	//DBFolder was updated, so now update the Snapshot
-	fData.Clear();
-        fData.SetIoV(result->beginTime(), result->endTime());
-
-        for (auto const channel : fFolder.GetChannelList()) {
-
-          float const gain = fFolder.GetDataAsDouble(channel, "gain");
-          float const gain_err = fFolder.GetDataAsDouble(channel, "gain_sigma");
-
-          PmtGain pg(channel);
-          pg.SetGain( gain );
-          pg.SetGainErr( gain_err );
-	  pg.SetExtraInfo(CalibrationExtraInfo("PmtGain"));
-
-	  fData.AddOrReplaceRow(pg);
-	}
-      }
+  bool SIOVPmtGainProvider::DBUpdate(DBTimeStamp_t ts) const
+  {
+    if (fDataSource != DataSource::Database or ts == fCurrentTimeStamp) {
+      return false;
     }
 
-    return rc;
+    mf::LogInfo("SIOVPmtGainProvider") << "SIOVPmtGainProvider::DBUpdate called with new timestamp.";
+
+    fCurrentTimeStamp = ts;
+
+    auto const dataset = fRetrievalAlg.GetDataset(ts);
+
+    Snapshot<PmtGain> data{dataset.beginTime(), dataset.endTime()};
+    for (auto const channel : dataset.channels()) {
+      PmtGain pg{channel,
+                 dataset.GetDataAsFloat(channel, "gain"),
+                 dataset.GetDataAsFloat(channel, "gain_sigma")};
+      data.AddOrReplaceRow(pg);
+    }
+
+    fData = data;
+    return true;
   }
 
   const PmtGain& SIOVPmtGainProvider::PmtGainObject(DBChannelID_t ch) const {
-    DBUpdate();
+    DBUpdate(fEventTimeStamp);
     return fData.GetRow(ch);
   }
 
   float SIOVPmtGainProvider::Gain(DBChannelID_t ch) const {
-    return this->PmtGainObject(ch).Gain();
+    return PmtGainObject(ch).Gain();
   }
 
   float SIOVPmtGainProvider::GainErr(DBChannelID_t ch) const {
-    return this->PmtGainObject(ch).GainErr();
+    return PmtGainObject(ch).GainErr();
   }
 
   CalibrationExtraInfo const& SIOVPmtGainProvider::ExtraInfo(DBChannelID_t ch) const {
-    return this->PmtGainObject(ch).ExtraInfo();
+    return PmtGainObject(ch).ExtraInfo();
   }
 
 

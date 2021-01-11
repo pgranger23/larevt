@@ -20,14 +20,13 @@ namespace lariov {
 
   //constructors
   DetPedestalRetrievalAlg::DetPedestalRetrievalAlg(const std::string& foldername,
-      			      			   const std::string& url,
-			      			   const std::string& tag /*=""*/) :
-    DatabaseRetrievalAlg(foldername, url, tag),
+                                                   const std::string& url,
+                                                   const std::string& tag /*=""*/) :
+    fRetrievalAlg{foldername, url, tag},
     fEventTimeStamp(0),
     fCurrentTimeStamp(0),
-    fDataSource(DataSource::Database) {
-
-    fData.Clear();
+    fDataSource(DataSource::Database)
+  {
     IOVTimeStamp tmp = IOVTimeStamp::MaxTimeStamp();
     tmp.SetStamp(tmp.Stamp()-1, tmp.SubStamp());
     fData.SetIoV(tmp, IOVTimeStamp::MaxTimeStamp());
@@ -35,8 +34,8 @@ namespace lariov {
 
 
   DetPedestalRetrievalAlg::DetPedestalRetrievalAlg(fhicl::ParameterSet const& p) :
-    DatabaseRetrievalAlg(p.get<fhicl::ParameterSet>("DatabaseRetrievalAlg")) {
-    fData.Clear();
+    fRetrievalAlg{p.get<fhicl::ParameterSet>("DatabaseRetrievalAlg")}
+  {
     IOVTimeStamp tmp = IOVTimeStamp::MaxTimeStamp();
     tmp.SetStamp(tmp.Stamp()-1, tmp.SubStamp());
     fData.SetIoV(tmp, IOVTimeStamp::MaxTimeStamp());
@@ -53,40 +52,26 @@ namespace lariov {
 
     if (fDataSource == DataSource::Default) {
       std::cout << "Using default pedestal values\n";
-      float default_collmean     = p.get<float>("DefaultCollMean", 400.0);
-      float default_collrms      = p.get<float>("DefaultCollRms", 0.3);
-      float default_mean_err     = p.get<float>("DefaultMeanErr", 0.0);
-      float default_rms_err      = p.get<float>("DefaultRmsErr", 0.0);
-      float default_indmean      = p.get<float>("DefaultIndMean", 2048.0);
-      float default_indrms       = p.get<float>("DefaultIndRms", 0.3);
-
-      DetPedestal DefaultColl(0);
-      DetPedestal DefaultInd(0);
-
-      DefaultColl.SetPedMean(default_collmean);
-      DefaultColl.SetPedMeanErr(default_mean_err);
-      DefaultColl.SetPedRms(default_collrms);
-      DefaultColl.SetPedRmsErr(default_rms_err);
-
-      DefaultInd.SetPedMean(default_indmean);
-      DefaultInd.SetPedMeanErr(default_mean_err);
-      DefaultInd.SetPedRms(default_indrms);
-      DefaultInd.SetPedRmsErr(default_rms_err);
+      auto const default_collmean = p.get<float>("DefaultCollMean", 400.0);
+      auto const default_collrms  = p.get<float>("DefaultCollRms", 0.3);
+      auto const default_mean_err = p.get<float>("DefaultMeanErr", 0.0);
+      auto const default_rms_err  = p.get<float>("DefaultRmsErr", 0.0);
+      auto const default_indmean  = p.get<float>("DefaultIndMean", 2048.0);
+      auto const default_indrms   = p.get<float>("DefaultIndRms", 0.3);
 
       art::ServiceHandle<geo::Geometry const> geo;
       geo::wire_id_iterator itW = geo->begin_wire_id();
       for ( ; itW != geo->end_wire_id(); ++itW) {
         DBChannelID_t ch = geo->PlaneWireToChannel(*itW);
-
         if (geo->SignalType(ch) == geo::kCollection) {
-	  DefaultColl.SetChannel(ch);
-	  fData.AddOrReplaceRow(DefaultColl);
-	}
-	else if (geo->SignalType(ch) == geo::kInduction) {
-	  DefaultInd.SetChannel(ch);
-	  fData.AddOrReplaceRow(DefaultInd);
-	}
-	else throw IOVDataError("Wire type is not collection or induction!");
+          DetPedestal DefaultColl(ch, default_collmean, default_mean_err, default_collrms, default_rms_err);
+          fData.AddOrReplaceRow(DefaultColl);
+        }
+        else if (geo->SignalType(ch) == geo::kInduction) {
+          DetPedestal DefaultInd(ch, default_indmean, default_mean_err, default_indrms, default_rms_err);
+          fData.AddOrReplaceRow(DefaultInd);
+        }
+        else throw IOVDataError("Wire type is not collection or induction!");
       }
     }
     else if (fDataSource == DataSource::File) {
@@ -96,31 +81,26 @@ namespace lariov {
       std::ifstream file(abs_fp);
       if (!file) {
         throw cet::exception("DetPedestalRetrievalAlg")
-	  << "File "<<abs_fp<<" is not found.";
+          << "File "<<abs_fp<<" is not found.";
       }
 
       std::string line;
-      DetPedestal dp(0);
       while (std::getline(file, line)) {
         size_t current_comma = line.find(',');
         DBChannelID_t ch = (DBChannelID_t)std::stoi(line.substr(0, current_comma));
-	float ped     = std::stof( line.substr(current_comma+1, line.find(',',current_comma+1)-(current_comma+1)) );
+        float ped     = std::stof( line.substr(current_comma+1, line.find(',',current_comma+1)-(current_comma+1)) );
 
-	current_comma = line.find(',',current_comma+1);
-	float rms     = std::stof( line.substr(current_comma+1, line.find(',',current_comma+1)-(current_comma+1)) );
+        current_comma = line.find(',',current_comma+1);
+        float rms     = std::stof( line.substr(current_comma+1, line.find(',',current_comma+1)-(current_comma+1)) );
 
-	current_comma = line.find(',',current_comma+1);
-	float ped_err = std::stof( line.substr(current_comma+1, line.find(',',current_comma+1)-(current_comma+1)) );
+        current_comma = line.find(',',current_comma+1);
+        float ped_err = std::stof( line.substr(current_comma+1, line.find(',',current_comma+1)-(current_comma+1)) );
 
-	current_comma = line.find(',',current_comma+1);
-	float rms_err = std::stof( line.substr(current_comma+1) );
+        current_comma = line.find(',',current_comma+1);
+        float rms_err = std::stof( line.substr(current_comma+1) );
 
-	dp.SetChannel(ch);
-	dp.SetPedMean(ped);
-        dp.SetPedMeanErr(ped_err);
-        dp.SetPedRms(rms);
-        dp.SetPedRmsErr(rms_err);
-	fData.AddOrReplaceRow(dp);
+        DetPedestal dp(ch, ped, rms, ped_err, rms_err);
+        fData.AddOrReplaceRow(dp);
       }
     } // if source from file
     else {
@@ -131,87 +111,72 @@ namespace lariov {
 
   // This method saves the time stamp of the latest event.
 
-  void DetPedestalRetrievalAlg::UpdateTimeStamp(DBTimeStamp_t ts) {
+  void DetPedestalRetrievalAlg::UpdateTimeStamp(DBTimeStamp_t ts)
+  {
     mf::LogInfo("DetPedestalRetrievalAlg") << "DetPedestalRetrievalAlg::UpdateTimeStamp called.";
     fEventTimeStamp = ts;
   }
 
   // Maybe update method cached data (public non-const version).
 
-  bool DetPedestalRetrievalAlg::Update(DBTimeStamp_t ts) {
-
+  bool DetPedestalRetrievalAlg::Update(DBTimeStamp_t ts)
+  {
     fEventTimeStamp = ts;
     return DBUpdate(ts);
-  }
-
-  // Maybe update method cached data (private const version using current event time).
-
-  bool DetPedestalRetrievalAlg::DBUpdate() const {
-    return DBUpdate(fEventTimeStamp);
   }
 
   // Maybe update method cached data (private const version).
   // This is the function that does the actual work of updating data from database.
 
-  bool DetPedestalRetrievalAlg::DBUpdate(DBTimeStamp_t ts) const {
-
-    bool rc = false;
-    if(fDataSource == DataSource::Database && ts != fCurrentTimeStamp) {
-
-      mf::LogInfo("DetPedestalRetrievalAlg") << "DetPedestalRetrievalAlg::DBUpdate called with new timestamp.";
-      fCurrentTimeStamp = ts;
-
-      // Call non-const base class method.
-
-      auto result = GetDataset(ts);
-      if(result) {
-        rc = true;
-
-	//DBFolder was updated, so now update the Snapshot
-	fData.Clear();
-        fData.SetIoV(result->beginTime(), result->endTime());
-
-        for (auto const channel : fFolder.GetChannelList()) {
-
-          float const mean = fFolder.GetDataAsDouble(channel, "mean");
-          float const mean_err = fFolder.GetDataAsDouble(channel, "mean_err");
-          float const rms = fFolder.GetDataAsDouble(channel, "rms");
-          float const rms_err = fFolder.GetDataAsDouble(channel, "rms_err");
-
-          DetPedestal pd(channel);
-          pd.SetPedMean( mean );
-          pd.SetPedMeanErr( mean_err );
-          pd.SetPedRms( rms );
-          pd.SetPedRmsErr( rms_err );
-
-	  fData.AddOrReplaceRow(pd);
-	}
-      }
+  bool DetPedestalRetrievalAlg::DBUpdate(DBTimeStamp_t ts) const
+  {
+    if (fDataSource != DataSource::Database or ts == fCurrentTimeStamp) {
+      return false;
     }
 
-    return rc;
+    mf::LogInfo("DetPedestalRetrievalAlg") << "DetPedestalRetrievalAlg::DBUpdate called with new timestamp.";
+    fCurrentTimeStamp = ts;
 
+    auto const dataset = fRetrievalAlg.GetDataset(ts);
+
+    Snapshot<DetPedestal> data{dataset.beginTime(), dataset.endTime()};
+    for (auto const channel : dataset.channels()) {
+      DetPedestal pd{channel,
+                     dataset.GetDataAsFloat(channel, "mean"),
+                     dataset.GetDataAsFloat(channel, "rms"),
+                     dataset.GetDataAsFloat(channel, "mean_err"),
+                     dataset.GetDataAsFloat(channel, "rms_err")};
+      data.AddOrReplaceRow(pd);
+    }
+
+    fData = data;
+    return true;
   }
 
-  const DetPedestal& DetPedestalRetrievalAlg::Pedestal(DBChannelID_t ch) const {
-    DBUpdate();
+  const DetPedestal& DetPedestalRetrievalAlg::Pedestal(DBChannelID_t ch) const
+  {
+    DBUpdate(fEventTimeStamp);
     return fData.GetRow(ch);
   }
 
-  float DetPedestalRetrievalAlg::PedMean(DBChannelID_t ch) const {
-    return this->Pedestal(ch).PedMean();
+  float DetPedestalRetrievalAlg::PedMean(DBChannelID_t ch) const
+  {
+    return Pedestal(ch).PedMean();
   }
 
-  float DetPedestalRetrievalAlg::PedRms(DBChannelID_t ch) const {
-    return this->Pedestal(ch).PedRms();
+  float DetPedestalRetrievalAlg::PedRms(DBChannelID_t ch) const
+  {
+    return Pedestal(ch).PedRms();
   }
 
-  float DetPedestalRetrievalAlg::PedMeanErr(DBChannelID_t ch) const {
-    return this->Pedestal(ch).PedMeanErr();
+  float DetPedestalRetrievalAlg::PedMeanErr(DBChannelID_t ch) const
+  {
+    return Pedestal(ch).PedMeanErr();
   }
 
-  float DetPedestalRetrievalAlg::PedRmsErr(DBChannelID_t ch) const {
-    return this->Pedestal(ch).PedRmsErr();
+  float DetPedestalRetrievalAlg::PedRmsErr(DBChannelID_t ch) const
+  {
+    return Pedestal(ch).PedRmsErr();
   }
 
 

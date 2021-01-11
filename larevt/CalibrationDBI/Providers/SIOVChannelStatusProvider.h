@@ -34,14 +34,13 @@ namespace lariov {
    * LArSoft interface to this class is through the service
    * SIOVChannelStatusService.
    */
-  class SIOVChannelStatusProvider: public DatabaseRetrievalAlg, public ChannelStatusProvider {
+  class SIOVChannelStatusProvider: public ChannelStatusProvider {
 
     public:
 
       /// Constructor
       SIOVChannelStatusProvider(fhicl::ParameterSet const& pset);
 
-      ///Default destructor
       virtual ~SIOVChannelStatusProvider() = default;
 
       //
@@ -117,6 +116,8 @@ namespace lariov {
       /// Do actual database updates.
 
       bool DBUpdate(DBTimeStamp_t ts) const;
+
+      DatabaseRetrievalAlg fRetrievalAlg;
 
       // Time stamps.
 
