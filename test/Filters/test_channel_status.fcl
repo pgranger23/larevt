@@ -66,8 +66,7 @@ services: {
     } # destinations
   } # message
 
-  Geometry:                      @local::standard_geo             # from geometry.fcl
-  ExptGeoHelperInterface:        @local::standard_geometry_helper # from geometry.fcl
+                                @table::standard_geometry_services # from geometry.fcl
   ChannelStatusService:         @local::channel_status
 
 } # services
