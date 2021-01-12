@@ -74,23 +74,14 @@ namespace lariov {
     fEventTimeStamp = ts;
   }
 
-  // Maybe update method cached data (public non-const version).
-
-  bool SIOVChannelStatusProvider::Update(DBTimeStamp_t ts) {
-
-    fEventTimeStamp = ts;
-    fNewNoisy.Clear();
-    return DBUpdate(ts);
-  }
-
-
   // Maybe update method cached data (private const version).
   // This is the function that does the actual work of updating data from database.
 
-  bool SIOVChannelStatusProvider::DBUpdate(DBTimeStamp_t ts) const
+  Snapshot<ChannelStatus> const&
+  SIOVChannelStatusProvider::DBUpdate(DBTimeStamp_t ts) const
   {
     if (fDataSource != DataSource::Database or ts == fCurrentTimeStamp) {
-      return false;
+      return fData;
     }
 
     mf::LogInfo("SIOVChannelStatusProvider") << "SIOVChannelStatusProvider::DBUpdate called with new timestamp.";
@@ -100,15 +91,12 @@ namespace lariov {
     auto const dataset = fRetrievalAlg.GetDataset(ts);
 
     Snapshot<ChannelStatus> data{dataset.beginTime(), dataset.endTime()};
-
     for (auto const channel : dataset.channels()) {
       ChannelStatus cs{channel,
                        static_cast<int>(dataset.GetDataAsLong(channel, "status"))};
       data.AddOrReplaceRow(cs);
     }
-
-    fData = data;
-    return true;
+    return fData = data;
   }
 
 
@@ -117,11 +105,10 @@ namespace lariov {
     if (fDataSource == DataSource::Default) {
       return fDefault;
     }
-    DBUpdate(ts);
     if (fNewNoisy.HasChannel(rawToDBChannel(ch))) {
       return fNewNoisy.GetRow(rawToDBChannel(ch));
     }
-    return fData.GetRow(rawToDBChannel(ch));
+    return DBUpdate(ts).GetRow(rawToDBChannel(ch));
   }
 
 

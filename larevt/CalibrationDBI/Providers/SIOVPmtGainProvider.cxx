@@ -81,21 +81,14 @@ namespace lariov {
     fEventTimeStamp = ts;
   }
 
-  // Maybe update method cached data (public non-const version).
-
-  bool SIOVPmtGainProvider::Update(DBTimeStamp_t ts)
-  {
-    fEventTimeStamp = ts;
-    return DBUpdate(ts);
-  }
-
   // Maybe update method cached data (private const version).
   // This is the function that does the actual work of updating data from database.
 
-  bool SIOVPmtGainProvider::DBUpdate(DBTimeStamp_t ts) const
+  Snapshot<PmtGain> const&
+  SIOVPmtGainProvider::DBUpdate(DBTimeStamp_t ts) const
   {
     if (fDataSource != DataSource::Database or ts == fCurrentTimeStamp) {
-      return false;
+      return fData;
     }
 
     mf::LogInfo("SIOVPmtGainProvider") << "SIOVPmtGainProvider::DBUpdate called with new timestamp.";
@@ -112,13 +105,11 @@ namespace lariov {
       data.AddOrReplaceRow(pg);
     }
 
-    fData = data;
-    return true;
+    return fData = data;
   }
 
   const PmtGain& SIOVPmtGainProvider::PmtGainObject(DBChannelID_t ch) const {
-    DBUpdate(fEventTimeStamp);
-    return fData.GetRow(ch);
+    return DBUpdate(fEventTimeStamp).GetRow(ch);
   }
 
   float SIOVPmtGainProvider::Gain(DBChannelID_t ch) const {

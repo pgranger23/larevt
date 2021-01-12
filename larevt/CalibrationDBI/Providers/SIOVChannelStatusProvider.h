@@ -96,11 +96,6 @@ namespace lariov {
       /// Update event time stamp.
       void UpdateTimeStamp(DBTimeStamp_t ts);
 
-      /// @name Configuration functions
-      /// @{
-      /// Prepares the object to provide information about the specified time
-      bool Update(DBTimeStamp_t);
-
       /// Allows a service to add to the list of noisy channels
       void AddNoisyChannel(DBTimeStamp_t ts, raw::ChannelID_t ch);
 
@@ -115,7 +110,7 @@ namespace lariov {
 
       /// Do actual database updates.
 
-      bool DBUpdate(DBTimeStamp_t ts) const;
+      Snapshot<ChannelStatus> const& DBUpdate(DBTimeStamp_t ts) const;
 
       DatabaseRetrievalAlg fRetrievalAlg;
 

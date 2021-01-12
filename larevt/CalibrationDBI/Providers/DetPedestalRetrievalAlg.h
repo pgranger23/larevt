@@ -67,9 +67,6 @@ namespace lariov {
       /// Update event time stamp.
       void UpdateTimeStamp(DBTimeStamp_t ts);
 
-      /// Update Snapshot and inherited DBFolder if using database.  Return true if updated
-      bool Update(DBTimeStamp_t ts);
-
       /// Retrieve pedestal information
       const DetPedestal& Pedestal(DBChannelID_t ch) const;
       float PedMean(DBChannelID_t ch) const override;
@@ -88,7 +85,7 @@ namespace lariov {
 
       /// Do actual database updates.
 
-      bool DBUpdate(DBTimeStamp_t ts) const;
+      Snapshot<DetPedestal> const& DBUpdate(DBTimeStamp_t ts) const;
 
       DatabaseRetrievalAlg fRetrievalAlg;
 

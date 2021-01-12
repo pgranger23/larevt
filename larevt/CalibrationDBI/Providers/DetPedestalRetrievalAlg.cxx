@@ -117,21 +117,14 @@ namespace lariov {
     fEventTimeStamp = ts;
   }
 
-  // Maybe update method cached data (public non-const version).
-
-  bool DetPedestalRetrievalAlg::Update(DBTimeStamp_t ts)
-  {
-    fEventTimeStamp = ts;
-    return DBUpdate(ts);
-  }
-
   // Maybe update method cached data (private const version).
   // This is the function that does the actual work of updating data from database.
 
-  bool DetPedestalRetrievalAlg::DBUpdate(DBTimeStamp_t ts) const
+  Snapshot<DetPedestal> const&
+  DetPedestalRetrievalAlg::DBUpdate(DBTimeStamp_t ts) const
   {
     if (fDataSource != DataSource::Database or ts == fCurrentTimeStamp) {
-      return false;
+      return fData;
     }
 
     mf::LogInfo("DetPedestalRetrievalAlg") << "DetPedestalRetrievalAlg::DBUpdate called with new timestamp.";
@@ -149,14 +142,12 @@ namespace lariov {
       data.AddOrReplaceRow(pd);
     }
 
-    fData = data;
-    return true;
+    return fData = data;
   }
 
   const DetPedestal& DetPedestalRetrievalAlg::Pedestal(DBChannelID_t ch) const
   {
-    DBUpdate(fEventTimeStamp);
-    return fData.GetRow(ch);
+    return DBUpdate(fEventTimeStamp).GetRow(ch);
   }
 
   float DetPedestalRetrievalAlg::PedMean(DBChannelID_t ch) const
@@ -178,7 +169,5 @@ namespace lariov {
   {
     return Pedestal(ch).PedRmsErr();
   }
-
-
 
 }//end namespace lariov

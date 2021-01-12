@@ -55,7 +55,6 @@ namespace lariov {
     }
   }
 
-  //returns true if an Update is performed, false if not
   DBDataset
   DBFolder::GetDataset( DBTimeStamp_t raw_time) const {
 
