@@ -14,7 +14,6 @@
 #include "fhiclcpp/ParameterSet.h"
 #include "larcore/Geometry/Geometry.h"
 #include "larevt/CalibrationDBI/IOVData/IOVDataConstants.h"
-#include "larevt/CalibrationDBI/Providers/DBFolder.h"
 #include "messagefacility/MessageLogger/MessageLogger.h"
 
 // C/C++ standard libraries
@@ -25,7 +24,7 @@ namespace lariov {
 
   //----------------------------------------------------------------------------
   SIOVChannelStatusProvider::SIOVChannelStatusProvider(fhicl::ParameterSet const& pset)
-    : fRetrievalAlg(pset.get<fhicl::ParameterSet>("DatabaseRetrievalAlg"))
+    : fDBFolder(pset.get<fhicl::ParameterSet>("DatabaseRetrievalAlg"))
     , fEventTimeStamp(0)
     , fCurrentTimeStamp(0)
     , fDefault{0,kGOOD}
@@ -88,7 +87,7 @@ namespace lariov {
 
     fCurrentTimeStamp = ts;
 
-    auto const dataset = fRetrievalAlg.GetDataset(ts);
+    auto const dataset = fDBFolder.GetDataset(ts);
 
     Snapshot<ChannelStatus> data{dataset.beginTime(), dataset.endTime()};
     for (auto const channel : dataset.channels()) {

@@ -15,7 +15,7 @@
 #include "larevt/CalibrationDBI/IOVData/Snapshot.h"
 #include "larevt/CalibrationDBI/IOVData/IOVDataConstants.h"
 #include "larevt/CalibrationDBI/Interface/PmtGainProvider.h"
-#include "DatabaseRetrievalAlg.h"
+#include "DBFolder.h"
 
 namespace lariov {
 
@@ -57,7 +57,7 @@ namespace lariov {
 
       Snapshot<PmtGain> const& DBUpdate(DBTimeStamp_t ts) const;
 
-      DatabaseRetrievalAlg fRetrievalAlg;
+      DBFolder fDBFolder;
 
       // Time stamps.
 

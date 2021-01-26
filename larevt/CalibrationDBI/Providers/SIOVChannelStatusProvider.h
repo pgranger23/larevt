@@ -13,7 +13,7 @@
 // LArSoft libraries
 #include "larcoreobj/SimpleTypesAndConstants/RawTypes.h"
 #include "larevt/CalibrationDBI/Interface/ChannelStatusProvider.h"
-#include "larevt/CalibrationDBI/Providers/DatabaseRetrievalAlg.h"
+#include "larevt/CalibrationDBI/Providers/DBFolder.h"
 #include "larevt/CalibrationDBI/IOVData/ChannelStatus.h"
 #include "larevt/CalibrationDBI/IOVData/Snapshot.h"
 #include "larevt/CalibrationDBI/IOVData/IOVDataConstants.h"
@@ -112,7 +112,7 @@ namespace lariov {
 
       Snapshot<ChannelStatus> const& DBUpdate(DBTimeStamp_t ts) const;
 
-      DatabaseRetrievalAlg fRetrievalAlg;
+      DBFolder fDBFolder;
 
       // Time stamps.
 

@@ -23,7 +23,7 @@
 #include "larevt/CalibrationDBI/IOVData/IOVDataConstants.h"
 #include "larevt/CalibrationDBI/Interface/CalibrationDBIFwd.h"
 #include "larevt/CalibrationDBI/Interface/DetPedestalProvider.h"
-#include "larevt/CalibrationDBI/Providers/DatabaseRetrievalAlg.h"
+#include "larevt/CalibrationDBI/Providers/DBFolder.h"
 
 #include "fhiclcpp/fwd.h"
 
@@ -87,7 +87,7 @@ namespace lariov {
 
       Snapshot<DetPedestal> const& DBUpdate(DBTimeStamp_t ts) const;
 
-      DatabaseRetrievalAlg fRetrievalAlg;
+      DBFolder fDBFolder;
 
       // Time stamps.
 

@@ -10,7 +10,6 @@
 #include "larcoreobj/SimpleTypesAndConstants/geo_types.h"    // for kCollection
 #include "larevt/CalibrationDBI/IOVData/IOVDataError.h"      // for IOVDataE...
 #include "larevt/CalibrationDBI/IOVData/IOVTimeStamp.h"      // for IOVTimeS...
-#include "larevt/CalibrationDBI/Providers/DBFolder.h"        // for DBFolder
 #include "messagefacility/MessageLogger/MessageLogger.h"
 
 //C/C++
@@ -22,7 +21,7 @@ namespace lariov {
   DetPedestalRetrievalAlg::DetPedestalRetrievalAlg(const std::string& foldername,
                                                    const std::string& url,
                                                    const std::string& tag /*=""*/) :
-    fRetrievalAlg{foldername, url, tag},
+    fDBFolder{foldername, url, tag},
     fEventTimeStamp(0),
     fCurrentTimeStamp(0),
     fDataSource(DataSource::Database)
@@ -34,7 +33,7 @@ namespace lariov {
 
 
   DetPedestalRetrievalAlg::DetPedestalRetrievalAlg(fhicl::ParameterSet const& p) :
-    fRetrievalAlg{p.get<fhicl::ParameterSet>("DatabaseRetrievalAlg")}
+    fDBFolder{p.get<fhicl::ParameterSet>("DatabaseRetrievalAlg")}
   {
     IOVTimeStamp tmp = IOVTimeStamp::MaxTimeStamp();
     tmp.SetStamp(tmp.Stamp()-1, tmp.SubStamp());
@@ -130,7 +129,7 @@ namespace lariov {
     mf::LogInfo("DetPedestalRetrievalAlg") << "DetPedestalRetrievalAlg::DBUpdate called with new timestamp.";
     fCurrentTimeStamp = ts;
 
-    auto const dataset = fRetrievalAlg.GetDataset(ts);
+    auto const dataset = fDBFolder.GetDataset(ts);
 
     Snapshot<DetPedestal> data{dataset.beginTime(), dataset.endTime()};
     for (auto const channel : dataset.channels()) {

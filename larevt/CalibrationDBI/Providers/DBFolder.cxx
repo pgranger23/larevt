@@ -10,6 +10,7 @@
 #include "sqlite3.h"
 #include "cetlib_except/exception.h"
 #include "cetlib/search_path.h"
+#include "fhiclcpp/ParameterSet.h"
 #include "messagefacility/MessageLogger/MessageLogger.h"
 
 namespace lariov {
@@ -55,6 +56,15 @@ namespace lariov {
     }
   }
 
+  DBFolder::DBFolder(fhicl::ParameterSet const& p)
+    :DBFolder {p.get<std::string>("DBFolderName"),
+                           p.get<std::string>("DBUrl"),
+                           p.get<std::string>("DBUrl2", ""),
+                           p.get<std::string>("DBTag", ""),
+                           p.get<bool>("UseSQLite", false),
+                           p.get<bool>("TestMode", false)}
+  {}
+  
   DBDataset
   DBFolder::GetDataset( DBTimeStamp_t raw_time) const {
 

@@ -10,8 +10,10 @@
 namespace lariov {
 
   //constructor
+  //MT note: Could use a better name instead of "DatabaseRetrievalAlg", 
+  //but dont want to break existing configurations
   SIOVElectronicsCalibProvider::SIOVElectronicsCalibProvider(fhicl::ParameterSet const& p) :
-    fRetrievalAlg(p.get<fhicl::ParameterSet>("DatabaseRetrievalAlg")),
+    fDBFolder(p.get<fhicl::ParameterSet>("DatabaseRetrievalAlg")),
     fEventTimeStamp(0),
     fCurrentTimeStamp(0)
   {
@@ -102,7 +104,7 @@ namespace lariov {
 
     fCurrentTimeStamp = ts;
 
-    auto const dataset = fRetrievalAlg.GetDataset(ts);
+    auto const dataset = fDBFolder.GetDataset(ts);
 
     Snapshot<ElectronicsCalib> data{dataset.beginTime(), dataset.endTime()};
     for (auto const channel : dataset.channels()) {

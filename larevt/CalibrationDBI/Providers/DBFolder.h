@@ -5,6 +5,8 @@
 #include "larevt/CalibrationDBI/Interface/CalibrationDBIFwd.h"
 #include "larevt/CalibrationDBI/Providers/DBDataset.h"
 
+#include "fhiclcpp/fwd.h"
+
 #include <string>
 #include <vector>
 
@@ -17,7 +19,7 @@ namespace lariov {
     public:
       DBFolder(const std::string& name, const std::string& url, const std::string& url2,
                const std::string& tag = "", bool useqlite=false, bool testmode=false);
-
+      explicit DBFolder(fhicl::ParameterSet const& p);
       const std::string& URL() const {return fURL;}
       const std::string& FolderName() const {return fFolderName;}
       const std::string& Tag() const {return fTag;}

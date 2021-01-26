@@ -15,7 +15,7 @@
 #include "larevt/CalibrationDBI/IOVData/Snapshot.h"
 #include "larevt/CalibrationDBI/IOVData/IOVDataConstants.h"
 #include "larevt/CalibrationDBI/Interface/ElectronicsCalibProvider.h"
-#include "DatabaseRetrievalAlg.h"
+#include "DBFolder.h"
 
 namespace lariov {
 
@@ -63,7 +63,7 @@ namespace lariov {
 
       Snapshot<ElectronicsCalib> const& DBUpdate(DBTimeStamp_t ts) const;
 
-      DatabaseRetrievalAlg fRetrievalAlg;
+      DBFolder fDBFolder;
 
       // Time stamps.
 
