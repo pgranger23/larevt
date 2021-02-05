@@ -15,6 +15,7 @@
 #include "larevt/CalibrationDBI/Interface/ChannelStatusProvider.h"
 #include "larevt/CalibrationDBI/Providers/DBFolder.h"
 #include "larevt/CalibrationDBI/IOVData/ChannelStatus.h"
+#include "larevt/CalibrationDBI/IOVData/ChannelStatusData.h"
 #include "larevt/CalibrationDBI/IOVData/Snapshot.h"
 #include "larevt/CalibrationDBI/IOVData/IOVDataConstants.h"
 #include "larevt/CalibrationDBI/Interface/CalibrationDBIFwd.h"
@@ -47,7 +48,7 @@ namespace lariov {
       // non-interface methods
       //
       /// Returns Channel Status
-      const ChannelStatus& GetChannelStatus(DBTimeStamp_t ts, raw::ChannelID_t channel) const;
+      ChannelStatus GetChannelStatus(DBTimeStamp_t ts, raw::ChannelID_t channel) const;
 
       //
       // interface methods
@@ -102,15 +103,14 @@ namespace lariov {
       ///@}
 
 
-      /// Converts LArSoft channel ID in the one proper for the DB
-      static DBChannelID_t rawToDBChannel(raw::ChannelID_t channel)
-        { return DBChannelID_t(channel); }
 
     private:
 
       /// Do actual database updates.
 
       Snapshot<ChannelStatus> const& DBUpdate(DBTimeStamp_t ts) const;
+      Snapshot<ChannelStatus> const& GetNoisyData(DBTimeStamp_t ts) const;
+      ChannelStatusDataPtr GetData(DBTimeStamp_t ts) const;
 
       DBFolder fDBFolder;
 

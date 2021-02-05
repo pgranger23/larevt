@@ -14,6 +14,7 @@
 #include "fhiclcpp/ParameterSet.h"
 #include "larcore/Geometry/Geometry.h"
 #include "larevt/CalibrationDBI/IOVData/IOVDataConstants.h"
+#include "larevt/CalibrationDBI/IOVData/ChannelStatusData.h"
 #include "messagefacility/MessageLogger/MessageLogger.h"
 
 // C/C++ standard libraries
@@ -21,7 +22,34 @@
 
 namespace lariov {
 
+     /// Converts LArSoft channel ID in the one proper for the DB
+     static DBChannelID_t rawToDBChannel(raw::ChannelID_t channel)
+       { return DBChannelID_t(channel); }
 
+class SIOVChannelStatusData : public ChannelStatusData {
+public:
+  SIOVChannelStatusData(Snapshot<ChannelStatus> const& noisy,
+                        Snapshot<ChannelStatus> const& dbdata, 
+                        DataSource::ds datasource)
+      : fNoisyData(noisy), 
+        fDBdata(dbdata),
+        fDataSource(datasource){}
+
+  ChannelStatus GetChannelStatus(raw::ChannelID_t ch) const {
+   if (fDataSource == DataSource::Default) {
+      return ChannelStatus{0, kGOOD};
+    }
+    if (fNoisyData.HasChannel(rawToDBChannel(ch))) {
+      return fNoisyData.GetRow(rawToDBChannel(ch));
+    }
+    return fDBdata.GetRow(rawToDBChannel(ch));
+  }
+
+private:
+  Snapshot<ChannelStatus> const& fNoisyData;
+  Snapshot<ChannelStatus> const& fDBdata;
+  DataSource::ds fDataSource;
+};
   //----------------------------------------------------------------------------
   SIOVChannelStatusProvider::SIOVChannelStatusProvider(fhicl::ParameterSet const& pset)
     : fDBFolder(pset.get<fhicl::ParameterSet>("DatabaseRetrievalAlg"))
@@ -98,16 +126,26 @@ namespace lariov {
     return fData = data;
   }
 
+// Get noisy data
+  Snapshot<ChannelStatus> const&
+  SIOVChannelStatusProvider::GetNoisyData(DBTimeStamp_t ts) const {
+    return fNewNoisy; 
+  }
 
+  ChannelStatusDataPtr
+  SIOVChannelStatusProvider::GetData(DBTimeStamp_t ts) const {
+   auto const& noisydata = GetNoisyData(ts);
+   auto const& dbdata = DBUpdate(ts);
+   return std::make_shared<SIOVChannelStatusData>(noisydata, dbdata, fDataSource); 
+  }
   //----------------------------------------------------------------------------
-  const ChannelStatus& SIOVChannelStatusProvider::GetChannelStatus(DBTimeStamp_t ts, raw::ChannelID_t ch) const {
-    if (fDataSource == DataSource::Default) {
-      return fDefault;
-    }
-    if (fNewNoisy.HasChannel(rawToDBChannel(ch))) {
-      return fNewNoisy.GetRow(rawToDBChannel(ch));
-    }
-    return DBUpdate(ts).GetRow(rawToDBChannel(ch));
+  //MT note for next week: 
+  //1. Introduce ChannelStatusData class/struct
+  //2. Use ChannelStatusData in the following function implementation
+  //3. and update IsBad, IsNoisy, etc to only use channel and not DBTimeStamp_t
+  ChannelStatus SIOVChannelStatusProvider::GetChannelStatus(DBTimeStamp_t ts, raw::ChannelID_t ch) const {
+   auto data = GetData(ts); // it will have noisydata and dbdata logic
+   return data->GetChannelStatus(ch);
   }
 
 
