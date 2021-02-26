@@ -22,7 +22,7 @@
 #include <iterator> // std::inserter()
 #include <utility> // std::pair<>
 
-std::set<raw::ChannelID_t> vectoset(fhicl::ParameterSet const& pset, std::string const name) {
+lariov::ChannelSet_t vectoset(fhicl::ParameterSet const& pset, std::string const name) {
    auto vec = pset.get<std::vector<raw::ChannelID_t>>(name, {});
    return {vec.begin(), vec.end()};
 }
@@ -51,7 +51,7 @@ namespace lariov {
 
 
   //----------------------------------------------------------------------------
-  SimpleChannelStatus::ChannelSet_t SimpleChannelStatus::GoodChannels(DBTimeStamp_t) const {
+  ChannelSet_t SimpleChannelStatus::GoodChannels(DBTimeStamp_t) const {
 
     ChannelSet_t GoodChannels;
     // go for the first (lowest) channel ID...

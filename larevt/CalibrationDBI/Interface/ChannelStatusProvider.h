@@ -23,6 +23,7 @@
 // LArSoft libraries
 #include "larcoreobj/SimpleTypesAndConstants/RawTypes.h" // raw::ChannelID_t
 #include "larevt/CalibrationDBI/Interface/CalibrationDBIFwd.h"
+#include "larevt/CalibrationDBI/IOVData/ChannelStatusData.h"
 
 /// Filters for channels, events, etc
 namespace lariov {
@@ -51,8 +52,6 @@ namespace lariov {
 
       using Status_t = unsigned short; ///< type representing channel status
 
-      /// Type of set of channel IDs
-      using ChannelSet_t = std::set<raw::ChannelID_t>;
 
       /// Value or invalid status
       static constexpr Status_t InvalidStatus

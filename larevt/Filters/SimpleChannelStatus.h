@@ -49,7 +49,6 @@ namespace lariov {
    */
   class SimpleChannelStatus: public lariov::ChannelStatusProvider {
       public:
-    using ChannelSet_t = lariov::ChannelStatusProvider::ChannelSet_t;
 
     /// Configuration
     explicit SimpleChannelStatus(fhicl::ParameterSet const& pset, 

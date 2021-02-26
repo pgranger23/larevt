@@ -33,7 +33,8 @@ public:
                         DataSource::ds datasource)
       : fNoisyData(noisy), 
         fDBdata(dbdata),
-        fDataSource(datasource){}
+        fDataSource(datasource) 
+        {}
 
   ChannelStatus GetChannelStatus(raw::ChannelID_t ch) const {
    if (fDataSource == DataSource::Default) {
@@ -43,6 +44,36 @@ public:
       return fNoisyData.GetRow(rawToDBChannel(ch));
     }
     return fDBdata.GetRow(rawToDBChannel(ch));
+  }
+
+  ChannelSet_t GoodChannels() const {
+    return GetChannelsWithStatus(kGOOD);
+  }
+
+  ChannelSet_t BadChannels() const {
+    ChannelSet_t dead = GetChannelsWithStatus(kDEAD);
+    ChannelSet_t ln = GetChannelsWithStatus(kLOWNOISE);
+    dead.insert(ln.begin(),ln.end());
+    return dead;
+  }
+
+  ChannelSet_t NoisyChannels() const {
+    return GetChannelsWithStatus(kNOISY);
+  
+}
+
+  ChannelSet_t GetChannelsWithStatus(chStatus status) const {
+    if (fDataSource == DataSource::Default && status != kGOOD) {
+      return {};
+    }
+    ChannelSet_t retSet;
+    DBChannelID_t maxChannel = art::ServiceHandle<geo::Geometry const>()->Nchannels() - 1;
+    for (DBChannelID_t ch=0; ch != maxChannel; ++ch) {
+     if (fDataSource == DataSource::Default || this->GetChannelStatus(ch).Status() == status) {
+       retSet.insert(ch);
+       }
+    }
+    return retSet;
   }
 
 private:
@@ -55,7 +86,6 @@ private:
     : fDBFolder(pset.get<fhicl::ParameterSet>("DatabaseRetrievalAlg"))
     , fEventTimeStamp(0)
     , fCurrentTimeStamp(0)
-    , fDefault{0,kGOOD}
   {
     bool UseDB    = pset.get<bool>("UseDB", false);
     bool UseFile  = pset.get<bool>("UseFile", false);
@@ -68,7 +98,7 @@ private:
     else              fDataSource = DataSource::Default;
 
     if (fDataSource == DataSource::Default) {
-      std::cout << "Using default channel status value: "<< fDefault.Status() <<"\n";
+      std::cout << "Using default channel status value: "<< kGOOD <<"\n";
     }
     else if (fDataSource == DataSource::File) {
       cet::search_path sp("FW_SEARCH_PATH");
@@ -138,77 +168,36 @@ private:
    auto const& dbdata = DBUpdate(ts);
    return std::make_shared<SIOVChannelStatusData>(noisydata, dbdata, fDataSource); 
   }
-  //----------------------------------------------------------------------------
-  //MT note for next week: 
-  //1. Introduce ChannelStatusData class/struct
-  //2. Use ChannelStatusData in the following function implementation
-  //3. and update IsBad, IsNoisy, etc to only use channel and not DBTimeStamp_t
-  ChannelStatus SIOVChannelStatusProvider::GetChannelStatus(DBTimeStamp_t ts, raw::ChannelID_t ch) const {
-   auto data = GetData(ts); // it will have noisydata and dbdata logic
-   return data->GetChannelStatus(ch);
-  }
-
 
   //----------------------------------------------------------------------------
-  SIOVChannelStatusProvider::ChannelSet_t
-  SIOVChannelStatusProvider::GetChannelsWithStatus(DBTimeStamp_t ts, chStatus status) const {
-
-    ChannelSet_t retSet;
-    retSet.clear();
-    DBChannelID_t maxChannel = art::ServiceHandle<geo::Geometry const>()->Nchannels() - 1;
-    if (fDataSource == DataSource::Default) {
-      if (fDefault.Status() == status) {
-        std::vector<DBChannelID_t> chs;
-        for (DBChannelID_t ch=0; ch != maxChannel; ++ch) {
-          chs.push_back(ch);
-        }
-        retSet.insert(chs.begin(), chs.end());
-      }
-    }
-    else {
-      std::vector<DBChannelID_t> chs;
-      for (DBChannelID_t ch=0; ch != maxChannel; ++ch) {
-        if (this->GetChannelStatus(ts, ch).Status() == status) chs.push_back(ch);
-      }
-
-      retSet.insert(chs.begin(), chs.end());
-    }
-    return retSet;
-  }
-
-
-  //----------------------------------------------------------------------------
-  SIOVChannelStatusProvider::ChannelSet_t
+  ChannelSet_t
   SIOVChannelStatusProvider::GoodChannels(DBTimeStamp_t ts) const {
-    return GetChannelsWithStatus(ts, kGOOD);
+    auto data = GetData(ts);
+    return data->GoodChannels();
   }
 
 
   //----------------------------------------------------------------------------
-  SIOVChannelStatusProvider::ChannelSet_t
+  ChannelSet_t
   SIOVChannelStatusProvider::BadChannels(DBTimeStamp_t ts) const {
-    ChannelSet_t dead = GetChannelsWithStatus(ts, kDEAD);
-    ChannelSet_t ln = GetChannelsWithStatus(ts, kLOWNOISE);
-    dead.insert(ln.begin(),ln.end());
-    return dead;
+    auto data = GetData(ts);
+    return data->BadChannels(); 
   }
 
 
   //----------------------------------------------------------------------------
-  SIOVChannelStatusProvider::ChannelSet_t
+  ChannelSet_t
   SIOVChannelStatusProvider::NoisyChannels(DBTimeStamp_t ts) const {
-    return GetChannelsWithStatus(ts, kNOISY);
+    auto data = GetData(ts);
+    return data->NoisyChannels(); 
   }
 
 
   //----------------------------------------------------------------------------
   void SIOVChannelStatusProvider::AddNoisyChannel(DBTimeStamp_t ts, raw::ChannelID_t ch)
   {
-    DBChannelID_t const dbch = rawToDBChannel(ch);
-    if (IsPresent(ts, dbch) and !IsBad(ts, dbch)) {
-      ChannelStatus cs{dbch, kNOISY};
-      fNewNoisy.AddOrReplaceRow(cs);
-    }
+    ChannelStatus cs{rawToDBChannel(ch), kNOISY};
+    fNewNoisy.AddOrReplaceRow(cs);
   }
 
 

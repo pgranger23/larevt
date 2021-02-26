@@ -45,12 +45,6 @@ namespace lariov {
       virtual ~SIOVChannelStatusProvider() = default;
 
       //
-      // non-interface methods
-      //
-      /// Returns Channel Status
-      ChannelStatus GetChannelStatus(DBTimeStamp_t ts, raw::ChannelID_t channel) const;
-
-      //
       // interface methods
       //
 
@@ -58,28 +52,29 @@ namespace lariov {
       /// @{
       /// Returns whether the specified channel is physical and connected to wire
       bool IsPresent(DBTimeStamp_t ts, raw::ChannelID_t channel) const override {
-        return GetChannelStatus(ts, channel).IsPresent();
+      auto data = GetData(ts);
+        return data->IsPresent(channel);
       }
 
       /// Returns whether the specified channel is bad in the current run
       bool IsBad(DBTimeStamp_t ts, raw::ChannelID_t channel) const override {
-        return GetChannelStatus(ts, channel).IsDead() || GetChannelStatus(ts, channel).IsLowNoise() || !IsPresent(ts, channel);
+      auto data = GetData(ts);
+      return data->IsDead(channel) || data->IsLowNoise(channel) || !data->IsPresent(channel);
       }
 
       /// Returns whether the specified channel is noisy in the current run
       bool IsNoisy(DBTimeStamp_t ts, raw::ChannelID_t channel) const override {
-        return GetChannelStatus(ts, channel).IsNoisy();
+      auto data = GetData(ts);
+      return data->IsNoisy(channel);
       }
 
       /// Returns whether the specified channel is physical and good
       bool IsGood(DBTimeStamp_t ts, raw::ChannelID_t channel) const override {
-        return GetChannelStatus(ts, channel).IsGood();
+        auto data = GetData(ts);
+        return data->IsGood(channel);
       }
       /// @}
 
-      Status_t Status(DBTimeStamp_t ts, raw::ChannelID_t channel) const override {
-        return (Status_t) this->GetChannelStatus(ts, channel).Status();
-      }
 
       /// @name Global channel queries
       /// @{
@@ -122,9 +117,7 @@ namespace lariov {
       DataSource::ds fDataSource;
       mutable Snapshot<ChannelStatus> fData;    // Lazily updated once per IOV.
       Snapshot<ChannelStatus> fNewNoisy;        // Updated once per event.
-      ChannelStatus fDefault;
 
-      ChannelSet_t GetChannelsWithStatus(DBTimeStamp_t ts, chStatus status) const;
 
   }; // class SIOVChannelStatusProvider
 
