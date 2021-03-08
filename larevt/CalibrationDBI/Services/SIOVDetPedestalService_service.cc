@@ -18,12 +18,7 @@ namespace lariov{
 
     public:
 
-      SIOVDetPedestalService(fhicl::ParameterSet const& pset, art::ActivityRegistry& reg);
-      ~SIOVDetPedestalService(){}
-
-      void PreProcessEvent(const art::Event& evt, art::ScheduleContext) {
-        fProvider.UpdateTimeStamp(evt.time().value());
-      }
+      SIOVDetPedestalService(fhicl::ParameterSet const& pset);
 
     private:
 
@@ -40,12 +35,9 @@ DECLARE_ART_SERVICE_INTERFACE_IMPL(lariov::SIOVDetPedestalService, lariov::DetPe
 
 namespace lariov{
 
-  SIOVDetPedestalService::SIOVDetPedestalService(fhicl::ParameterSet const& pset, art::ActivityRegistry& reg)
+  SIOVDetPedestalService::SIOVDetPedestalService(fhicl::ParameterSet const& pset)
   : fProvider(pset.get<fhicl::ParameterSet>("DetPedestalRetrievalAlg"))
   {
-    //register callback to update local database cache before each event is processed
-    //reg.sPreProcessEvent.watch(&SIOVDetPedestalService::PreProcessEvent, *this);
-    reg.sPreProcessEvent.watch(this, &SIOVDetPedestalService::PreProcessEvent);
   }
 
 }//end namespace lariov

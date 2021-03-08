@@ -64,15 +64,11 @@ namespace lariov {
 
       DetPedestalRetrievalAlg(fhicl::ParameterSet const& p);
 
-      /// Update event time stamp.
-      void UpdateTimeStamp(DBTimeStamp_t ts);
-
       /// Retrieve pedestal information
-      const DetPedestal& Pedestal(DBChannelID_t ch) const;
-      float PedMean(DBChannelID_t ch) const override;
-      float PedRms(DBChannelID_t ch) const override;
-      float PedMeanErr(DBChannelID_t ch) const override;
-      float PedRmsErr(DBChannelID_t ch) const override;
+      float PedMean(DBTimeStamp_t ts, DBChannelID_t ch) const override;
+      float PedRms(DBTimeStamp_t ts, DBChannelID_t ch) const override;
+      float PedMeanErr(DBTimeStamp_t ts, DBChannelID_t ch) const override;
+      float PedRmsErr(DBTimeStamp_t ts, DBChannelID_t ch) const override;
 
       //hardcoded information about database folder - useful for debugging cross checks
       static constexpr unsigned int NCOLUMNS = 5;
@@ -91,11 +87,11 @@ namespace lariov {
 
       // Time stamps.
 
-      DBTimeStamp_t fEventTimeStamp;            // Most recently seen time stamp.
       mutable DBTimeStamp_t fCurrentTimeStamp;  // Time stamp of cached data.
 
       DataSource::ds fDataSource;
       mutable Snapshot<DetPedestal> fData;
+      const DetPedestal& Pedestal(DBTimeStamp_t ts, DBChannelID_t ch) const;
   };
 }//end namespace lariov
 

@@ -22,7 +22,6 @@ namespace lariov {
                                                    const std::string& url,
                                                    const std::string& tag /*=""*/) :
     fDBFolder{foldername, url, tag},
-    fEventTimeStamp(0),
     fCurrentTimeStamp(0),
     fDataSource(DataSource::Database)
   {
@@ -108,13 +107,6 @@ namespace lariov {
   }
 
 
-  // This method saves the time stamp of the latest event.
-
-  void DetPedestalRetrievalAlg::UpdateTimeStamp(DBTimeStamp_t ts)
-  {
-    mf::LogInfo("DetPedestalRetrievalAlg") << "DetPedestalRetrievalAlg::UpdateTimeStamp called.";
-    fEventTimeStamp = ts;
-  }
 
   // Maybe update method cached data (private const version).
   // This is the function that does the actual work of updating data from database.
@@ -144,29 +136,29 @@ namespace lariov {
     return fData = data;
   }
 
-  const DetPedestal& DetPedestalRetrievalAlg::Pedestal(DBChannelID_t ch) const
+  const DetPedestal& DetPedestalRetrievalAlg::Pedestal(DBTimeStamp_t ts, DBChannelID_t ch) const
   {
-    return DBUpdate(fEventTimeStamp).GetRow(ch);
+    return DBUpdate(ts).GetRow(ch);
   }
 
-  float DetPedestalRetrievalAlg::PedMean(DBChannelID_t ch) const
+  float DetPedestalRetrievalAlg::PedMean(DBTimeStamp_t ts, DBChannelID_t ch) const
   {
-    return Pedestal(ch).PedMean();
+    return Pedestal(ts, ch).PedMean();
   }
 
-  float DetPedestalRetrievalAlg::PedRms(DBChannelID_t ch) const
+  float DetPedestalRetrievalAlg::PedRms(DBTimeStamp_t ts, DBChannelID_t ch) const
   {
-    return Pedestal(ch).PedRms();
+    return Pedestal(ts, ch).PedRms();
   }
 
-  float DetPedestalRetrievalAlg::PedMeanErr(DBChannelID_t ch) const
+  float DetPedestalRetrievalAlg::PedMeanErr(DBTimeStamp_t ts, DBChannelID_t ch) const
   {
-    return Pedestal(ch).PedMeanErr();
+    return Pedestal(ts, ch).PedMeanErr();
   }
 
-  float DetPedestalRetrievalAlg::PedRmsErr(DBChannelID_t ch) const
+  float DetPedestalRetrievalAlg::PedRmsErr(DBTimeStamp_t ts, DBChannelID_t ch) const
   {
-    return Pedestal(ch).PedRmsErr();
+    return Pedestal(ts, ch).PedRmsErr();
   }
 
 }//end namespace lariov

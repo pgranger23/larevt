@@ -12,7 +12,7 @@
 // LArSoft libraries
 #include "larcorealg/CoreUtils/UncopiableAndUnmovableClass.h"
 #include "larcoreobj/SimpleTypesAndConstants/RawTypes.h" // raw::ChannelID_t
-
+#include "larevt/CalibrationDBI/IOVData/IOVDataConstants.h"
 
 namespace lariov {
 
@@ -29,15 +29,11 @@ namespace lariov {
       virtual ~DetPedestalProvider() = default;
 
       /// Retrieve pedestal information
-      virtual float PedMean(raw::ChannelID_t ch) const = 0;
-      virtual float PedRms(raw::ChannelID_t ch) const = 0;
-      virtual float PedMeanErr(raw::ChannelID_t ch) const = 0;
-      virtual float PedRmsErr(raw::ChannelID_t ch) const = 0;
+      virtual float PedMean(DBTimeStamp_t ts, raw::ChannelID_t ch) const = 0;
+      virtual float PedRms(DBTimeStamp_t ts, raw::ChannelID_t ch) const = 0;
+      virtual float PedMeanErr(DBTimeStamp_t ts, raw::ChannelID_t ch) const = 0;
+      virtual float PedRmsErr(DBTimeStamp_t ts, raw::ChannelID_t ch) const = 0;
 
-    /* TODO DELME
-      /// Update local state of implementation
-      virtual bool Update(DBTimeStamp_t ts) = 0;
-    */
   };
 }//end namespace lariov
 
