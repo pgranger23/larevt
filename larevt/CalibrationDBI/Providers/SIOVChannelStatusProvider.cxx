@@ -84,7 +84,6 @@ private:
   //----------------------------------------------------------------------------
   SIOVChannelStatusProvider::SIOVChannelStatusProvider(fhicl::ParameterSet const& pset)
     : fDBFolder(pset.get<fhicl::ParameterSet>("DatabaseRetrievalAlg"))
-    , fEventTimeStamp(0)
     , fCurrentTimeStamp(0)
   {
     bool UseDB    = pset.get<bool>("UseDB", false);
@@ -128,7 +127,6 @@ private:
   void SIOVChannelStatusProvider::UpdateTimeStamp(DBTimeStamp_t ts) {
     mf::LogInfo("SIOVChannelStatusProvider") << "SIOVChannelStatusProvider::UpdateTimeStamp called.";
     fNewNoisy.Clear();
-    fEventTimeStamp = ts;
   }
 
   // Maybe update method cached data (private const version).

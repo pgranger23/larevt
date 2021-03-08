@@ -111,7 +111,6 @@ namespace lariov {
 
       // Time stamps.
 
-      DBTimeStamp_t fEventTimeStamp;            // Most recently seen time stamp.
       mutable DBTimeStamp_t fCurrentTimeStamp;  // Time stamp of cached data.
 
       DataSource::ds fDataSource;
