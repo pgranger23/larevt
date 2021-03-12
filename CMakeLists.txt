@@ -6,9 +6,7 @@
 #  buildtool [-I /install/path] -bt[i] -jN
 # ======================================================================
 
-
-# use cmake 3.14 or later
-cmake_minimum_required (VERSION 3.12...3.14 FATAL_ERROR)
+cmake_minimum_required (VERSION 3.12...3.18 FATAL_ERROR)
 
 project(larevt LANGUAGES CXX)
 
@@ -42,7 +40,6 @@ find_ups_product( messagefacility )
 find_ups_root()
 find_ups_product( postgresql )
 find_ups_product( libwda )
-find_ups_product( cetbuildtools )
 
 # macros for dictionary and simple_plugin
 include(ArtDictionary)

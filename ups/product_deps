@@ -1,24 +1,22 @@
 # The parent line must be the first non-comment line in the file
 # This line defines the product name and version
-parent	larevt	v09_01_04
+parent	larevt	v09_02_02
 defaultqual	e19
 #
 fcldir product_dir job
 #
 product         version
-lardata		v09_01_07
-libwda          v2_28_0
-cetbuildtools	v7_15_01	-	only_for_build
+lardata		v09_02_01
+libwda          v2_29_1
+cetbuildtools	v7_17_01	-	only_for_build
 end_product_list
 
 
 qualifier       lardata         libwda	notes
-e19:py2:debug   e19:py2:debug   -nq-
-e19:py2:prof    e19:py2:prof    -nq-
+e20:debug       e20:debug       -nq-
+e20:prof        e20:prof        -nq-
 e19:debug       e19:debug       -nq-
 e19:prof        e19:prof        -nq-
-c7:py2:debug    c7:py2:debug    -nq-
-c7:py2:prof     c7:py2:prof     -nq-
 c7:debug        c7:debug        -nq-
 c7:prof         c7:prof         -nq-
 end_qualifier_list
