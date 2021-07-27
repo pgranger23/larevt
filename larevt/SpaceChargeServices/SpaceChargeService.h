@@ -9,8 +9,9 @@
 #ifndef SPACECHARGESERVICE_H
 #define SPACECHARGESERVICE_H
 
-#include "art/Framework/Services/Registry/ServiceMacros.h"
 #include "larevt/SpaceCharge/SpaceCharge.h"
+
+#include "art/Framework/Services/Registry/ServiceDeclarationMacros.h"
 
 namespace spacecharge {
   class SpaceChargeService {

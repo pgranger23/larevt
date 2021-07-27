@@ -1,7 +1,6 @@
 #ifndef ELECTRONLIFETIMESERVICE_H
 #define ELECTRONLIFETIMESERVICE_H
 
-#include "art/Framework/Services/Registry/ServiceMacros.h"
 #include "larcore/CoreUtils/ServiceUtil.h"
 
 //forward declarations

@@ -1,6 +1,6 @@
-#include "art/Framework/Services/Registry/ServiceMacros.h"
 #include "art/Framework/Services/Registry/ActivityRegistry.h"
 #include "art/Framework/Principal/Event.h"
+#include "art/Framework/Services/Registry/ServiceDefinitionMacros.h"
 #include "art/Persistency/Provenance/ScheduleContext.h"
 #include "fhiclcpp/ParameterSet.h"
 #include "larevt/CalibrationDBI/Interface/ElectronicsCalibService.h"
