@@ -1,12 +1,12 @@
 art_make(NO_PLUGINS
          LIB_LIBRARIES
-           canvas
-           ${FHICLCPP}
+           canvas::canvas
+           fhiclcpp::fhiclcpp
            ROOT::Core
            ROOT::Hist
            ROOT::RIO
-           cetlib
-           cetlib_except
+           cetlib::cetlib
+           cetlib_except::cetlib_except
          )
 
 install_headers()

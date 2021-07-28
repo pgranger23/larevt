@@ -2,17 +2,17 @@ cet_enable_asserts()
 
 simple_plugin(FFTTest "module"
 			lardata_Utilities_LArFFT_service
-			${ART_FRAMEWORK_SERVICES_REGISTRY}
-			${ART_ROOT_IO_TFILE_SUPPORT} ROOT::Core
-			${ART_ROOT_IO_TFILESERVICE_SERVICE}
-			art_Persistency_Common
-			art_Persistency_Provenance
-	 		art_Utilities
-                        canvas
-			${MF_MESSAGELOGGER}
+			art::Framework_Services_Registry
+			art_root_io::tfile_support ROOT::Core
+			art_root_io::TFileService_service
+			art::Persistency_Common
+			art::Persistency_Provenance
+	 		art::Utilities
+                        canvas::canvas
+			messagefacility::MF_MessageLogger
 
-	                ${FHICLCPP}
-			cetlib cetlib_except
+	                fhiclcpp::fhiclcpp
+			cetlib::cetlib cetlib_except
 			${ROOT_BASIC_LIB_LIST}
 
 )
