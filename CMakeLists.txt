@@ -27,7 +27,6 @@ cet_set_compiler_flags(DIAGS CAUTIOUS
 cet_report_compiler_flags()
 
 # these are minimum required versions, not the actual product versions
-find_ups_product( clhep )
 find_ups_product( larcoreobj )
 find_ups_product( larcorealg )
 find_ups_product( larcore )
@@ -41,6 +40,7 @@ find_ups_product( messagefacility )
 find_ups_root()
 find_ups_product( postgresql )
 find_ups_product( libwda )
+find_ups_product(clhep)
 
 # macros for dictionary and simple_plugin
 include(ArtDictionary)

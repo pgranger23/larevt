@@ -5,8 +5,8 @@ include_directories($ENV{LIBWDA_FQ_DIR}/include)
 
 art_make(LIB_LIBRARIES
            larevt_CalibrationDBI_IOVData
-           ${LIBWDA}
-           ${SQLITE}
+           LIBWDA
+           SQLITE
            messagefacility::MF_MessageLogger
            fhiclcpp::fhiclcpp
            canvas::canvas
@@ -15,7 +15,7 @@ art_make(LIB_LIBRARIES
            larcorealg_Geometry
            art::Framework_Services_Registry
            ROOT::Core
-           ${ART_UTILITIES}
+           art::Utilities
         )
 
 install_headers()
