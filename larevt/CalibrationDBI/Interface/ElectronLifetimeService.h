@@ -2,6 +2,7 @@
 #define ELECTRONLIFETIMESERVICE_H
 
 #include "larcore/CoreUtils/ServiceUtil.h"
+#include "art/Framework/Services/Registry/ServiceDeclarationMacros.h"
 
 //forward declarations
 namespace lariov {

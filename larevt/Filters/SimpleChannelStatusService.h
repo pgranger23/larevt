@@ -15,6 +15,7 @@
 // LArSoft libraries
 #include "larevt/Filters/SimpleChannelStatus.h"
 #include "larevt/CalibrationDBI/Interface/ChannelStatusService.h"
+#include "art/Framework/Services/Registry/ServiceDeclarationMacros.h"
 
 // C/C++ standard libraries
 #include <memory> //std::unique_ptr<>
