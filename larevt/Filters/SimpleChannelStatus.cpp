@@ -28,8 +28,7 @@ lariov::ChannelSet_t vectoset(fhicl::ParameterSet const& pset, std::string const
 }
 
 namespace lariov {
-
-
+  
   //----------------------------------------------------------------------------
   SimpleChannelStatus::SimpleChannelStatus(fhicl::ParameterSet const& pset, 
                                            raw::ChannelID_t maxchannel,

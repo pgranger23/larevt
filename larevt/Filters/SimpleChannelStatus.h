@@ -92,7 +92,6 @@ namespace lariov {
       { return fNoisyChannels; }
     /// @}
 
-
     //
     // non-interface methods and configuration methods
 

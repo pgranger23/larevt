@@ -69,6 +69,8 @@ namespace lariov {
       /// Virtual destructor; destructs nothing
       virtual ~ChannelStatusProvider() = default;
 
+      //virtual ChannelStatusDataPtr DataFor(DBTimeStamp_t ts) const = 0;
+
       /// Returns whether the specified channel is physical and connected to wire
       virtual bool IsPresent(DBTimeStamp_t ts, raw::ChannelID_t channel) const = 0;
 
