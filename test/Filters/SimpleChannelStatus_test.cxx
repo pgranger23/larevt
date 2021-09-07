@@ -16,8 +16,7 @@
  * (for example, a random seed).
  */
 #define BOOST_TEST_MODULE ( simple_channel_status_test )
-#include <cetlib/quiet_unit_test.hpp> // BOOST_AUTO_TEST_CASE()
-#include <boost/test/test_tools.hpp> // BOOST_CHECK(), BOOST_CHECK_EQUAL()
+#include "boost/test/unit_test.hpp"
 
 // LArSoft libraries
 #include "larevt/Filters/SimpleChannelStatus.h"
@@ -27,9 +26,8 @@
 #include "fhiclcpp/ParameterSet.h"
 #include "fhiclcpp/coding.h"
 
-#include <any> // std::any replaces boost::any
-
 // C/C++ standard library
+#include <any>
 #include <iostream>
 #include <ostream>
 #include <set>
@@ -91,7 +89,7 @@ class StatusConfiguration {
 
   fhicl::ParameterSet CreateConfiguration() const {
     fhicl::ParameterSet cfg;
-    
+
     std::any any {fhicl::detail::encode(fNoisyChannels)};
     cfg.put("NoisyChannels", fNoisyChannels);
     cfg.put("BadChannels", fBadChannels);
@@ -142,9 +140,9 @@ void test_simple_status() {
   lariov::SimpleChannelStatus const* pSimpleStatus = StatusOwner.get();
 
   // check the values of the extremes
-  BOOST_CHECK_EQUAL(pSimpleStatus->MaxChannel(), statusCreator.fMaxChannel);
-  BOOST_CHECK_EQUAL
-    (pSimpleStatus->MaxChannelPresent(), statusCreator.fMaxPresentChannel);
+  BOOST_TEST(pSimpleStatus->MaxChannel() == statusCreator.fMaxChannel);
+  BOOST_TEST
+    (pSimpleStatus->MaxChannelPresent() == statusCreator.fMaxPresentChannel);
 
   // downcast to the interface to test interface stuff
   lariov::ChannelStatusProvider const* pStatus = pSimpleStatus;
@@ -171,15 +169,15 @@ void test_simple_status() {
 
   // ChannelStatusBaseInterface::BadChannels()
   std::set<raw::ChannelID_t> StatusBadChannels = pStatus->BadChannels();
-  BOOST_CHECK_EQUAL
-    (StatusBadChannels.size(), statusCreator.fBadChannels.size());
-  BOOST_CHECK_EQUAL(StatusBadChannels, statusCreator.fBadChannels);
+  BOOST_TEST
+    (StatusBadChannels.size() == statusCreator.fBadChannels.size());
+  BOOST_TEST(StatusBadChannels == statusCreator.fBadChannels);
 
   // ChannelStatusBaseInterface::NoisyChannels()
   std::set<raw::ChannelID_t> StatusNoisyChannels = pStatus->NoisyChannels();
-  BOOST_CHECK_EQUAL
-    (StatusNoisyChannels.size(), statusCreator.fNoisyChannels.size());
-  BOOST_CHECK_EQUAL(StatusNoisyChannels, statusCreator.fNoisyChannels);
+  BOOST_TEST
+    (StatusNoisyChannels.size() == statusCreator.fNoisyChannels.size());
+  BOOST_TEST(StatusNoisyChannels == statusCreator.fNoisyChannels);
 
   std::set<raw::ChannelID_t> GoodChannels;
 
@@ -195,18 +193,18 @@ void test_simple_status() {
 
     if (bGood) GoodChannels.insert(channel);
 
-    BOOST_CHECK_EQUAL(pStatus->IsPresent(channel), bPresent);
-    BOOST_CHECK_EQUAL(pStatus->IsBad(channel), bBad);
-    BOOST_CHECK_EQUAL(pStatus->IsNoisy(channel), bNoisy);
+    BOOST_TEST(pStatus->IsPresent(channel) == bPresent);
+    BOOST_TEST(pStatus->IsBad(channel) == bBad);
+    BOOST_TEST(pStatus->IsNoisy(channel) == bNoisy);
 
-    BOOST_CHECK_EQUAL(pStatus->IsGood(channel), bGood);
+    BOOST_TEST(pStatus->IsGood(channel) == bGood);
 
   } // for channel
 
   // ChannelStatusBaseInterface::GoodChannels()
   std::set<raw::ChannelID_t> StatusGoodChannels = pStatus->GoodChannels();
-  BOOST_CHECK_EQUAL(StatusGoodChannels.size(), GoodChannels.size());
-  BOOST_CHECK_EQUAL(StatusGoodChannels, GoodChannels);
+  BOOST_TEST(StatusGoodChannels.size() == GoodChannels.size());
+  BOOST_TEST(StatusGoodChannels == GoodChannels);
 
 } // test_simple_status()
 
@@ -217,4 +215,3 @@ void test_simple_status() {
 BOOST_AUTO_TEST_CASE(SimpleStatusTest) {
   test_simple_status();
 }
-
