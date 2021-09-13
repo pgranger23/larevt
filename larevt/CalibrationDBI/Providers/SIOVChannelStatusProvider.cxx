@@ -151,6 +151,8 @@ private:
                        static_cast<int>(dataset.GetDataAsLong(channel, "status"))};
       data.AddOrReplaceRow(cs);
     }
+    // SS: we will be entering a new entery into the cache
+    // and return it
     return fData = data;
   }
 
