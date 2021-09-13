@@ -6,9 +6,9 @@
 #  buildtool [-I /install/path] -bt[i] -jN
 # ======================================================================
 
-cmake_minimum_required (VERSION 3.12...3.18 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.19 FATAL_ERROR)
 
-project(larevt LANGUAGES CXX)
+project(larevt VERSION 09.02.10.01 LANGUAGES CXX)
 
 # cetbuildtools contains our cmake modules
 find_package(cetbuildtools REQUIRED)
@@ -40,6 +40,7 @@ find_ups_product( messagefacility )
 find_ups_root()
 find_ups_product( postgresql )
 find_ups_product( libwda )
+find_ups_product(clhep)
 
 # macros for dictionary and simple_plugin
 include(ArtDictionary)

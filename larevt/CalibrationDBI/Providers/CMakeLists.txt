@@ -5,17 +5,17 @@ include_directories($ENV{LIBWDA_FQ_DIR}/include)
 
 art_make(LIB_LIBRARIES
            larevt_CalibrationDBI_IOVData
-           ${LIBWDA}
-           ${SQLITE}
-           ${MF_MESSAGELOGGER}
-           ${FHICLCPP}
-           canvas
-           cetlib
-           cetlib_except
+           LIBWDA
+           SQLITE
+           messagefacility::MF_MessageLogger
+           fhiclcpp::fhiclcpp
+           canvas::canvas
+           cetlib::cetlib
+           cetlib_except::cetlib_except
            larcorealg_Geometry
-           ${ART_FRAMEWORK_SERVICES_REGISTRY}
+           art::Framework_Services_Registry
            ROOT::Core
-           ${ART_UTILITIES}
+           art::Utilities
         )
 
 install_headers()

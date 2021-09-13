@@ -117,6 +117,7 @@ namespace filt{
     if (!IsPrimaryCheck(particle,index)) return false;
     if (!MinMomentumCheck(particle,index)) return false;
     if (!MaxMomentumCheck(particle,index)) return false;
+    if (!StartInTPCCheck(particle,index)) return false;
     if (!StopInTPCCheck(particle,index)) return false;
     if (!TPCTrajLengthCheck(particle,index)) return false;
 

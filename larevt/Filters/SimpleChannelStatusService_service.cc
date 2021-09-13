@@ -13,6 +13,7 @@
 #include "larcore/Geometry/Geometry.h"
 
 // Framework libraries
+#include "art/Framework/Services/Registry/ServiceDefinitionMacros.h"
 #include "art/Framework/Services/Registry/ServiceHandle.h"
 #include "messagefacility/MessageLogger/MessageLogger.h"
 
