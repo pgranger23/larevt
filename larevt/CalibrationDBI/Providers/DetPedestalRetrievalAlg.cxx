@@ -22,21 +22,14 @@ namespace lariov {
                                                    const std::string& url,
                                                    const std::string& tag /*=""*/) :
     fDBFolder{foldername, url, tag},
-    fCurrentTimeStamp(0),
     fDataSource(DataSource::Database)
   {
-    IOVTimeStamp tmp = IOVTimeStamp::MaxTimeStamp();
-    tmp.SetStamp(tmp.Stamp()-1, tmp.SubStamp());
-    fData.SetIoV(tmp, IOVTimeStamp::MaxTimeStamp());
   }
 
 
   DetPedestalRetrievalAlg::DetPedestalRetrievalAlg(fhicl::ParameterSet const& p) :
     fDBFolder{p.get<fhicl::ParameterSet>("DatabaseRetrievalAlg")}
   {
-    IOVTimeStamp tmp = IOVTimeStamp::MaxTimeStamp();
-    tmp.SetStamp(tmp.Stamp()-1, tmp.SubStamp());
-    fData.SetIoV(tmp, IOVTimeStamp::MaxTimeStamp());
 
     bool UseDB      = p.get<bool>("UseDB", false);
     bool UseFile   = p.get<bool>("UseFile", false);
@@ -48,6 +41,14 @@ namespace lariov {
     else if (UseFile) fDataSource = DataSource::File;
     else              fDataSource = DataSource::Default;
 
+    if (fDataSource == DataSource::Database) {
+      std::cout << "Using pedestals from conditions database\n";
+      return;
+    }
+    Snapshot<DetPedestal> snapshot;
+    IOVTimeStamp tmp = IOVTimeStamp::MaxTimeStamp();
+    tmp.SetStamp(tmp.Stamp()-1, tmp.SubStamp());
+    snapshot.SetIoV(tmp, IOVTimeStamp::MaxTimeStamp());
     if (fDataSource == DataSource::Default) {
       std::cout << "Using default pedestal values\n";
       auto const default_collmean = p.get<float>("DefaultCollMean", 400.0);
@@ -63,11 +64,11 @@ namespace lariov {
         DBChannelID_t ch = geo->PlaneWireToChannel(*itW);
         if (geo->SignalType(ch) == geo::kCollection) {
           DetPedestal DefaultColl(ch, default_collmean, default_mean_err, default_collrms, default_rms_err);
-          fData.AddOrReplaceRow(DefaultColl);
+          snapshot.AddOrReplaceRow(DefaultColl);
         }
         else if (geo->SignalType(ch) == geo::kInduction) {
           DetPedestal DefaultInd(ch, default_indmean, default_mean_err, default_indrms, default_rms_err);
-          fData.AddOrReplaceRow(DefaultInd);
+          snapshot.AddOrReplaceRow(DefaultInd);
         }
         else throw IOVDataError("Wire type is not collection or induction!");
       }
@@ -98,12 +99,10 @@ namespace lariov {
         float rms_err = std::stof( line.substr(current_comma+1) );
 
         DetPedestal dp(ch, ped, rms, ped_err, rms_err);
-        fData.AddOrReplaceRow(dp);
+        snapshot.AddOrReplaceRow(dp);
       }
     } // if source from file
-    else {
-      std::cout << "Using pedestals from conditions database\n";
-    }
+    fData.emplace(0, std::move(snapshot));
   }
 
 
@@ -111,15 +110,17 @@ namespace lariov {
   // Maybe update method cached data (private const version).
   // This is the function that does the actual work of updating data from database.
 
-  Snapshot<DetPedestal> const&
+  DetPedestalRetrievalAlg::handle_t
   DetPedestalRetrievalAlg::DBUpdate(DBTimeStamp_t ts) const
   {
-    if (fDataSource != DataSource::Database or ts == fCurrentTimeStamp) {
-      return fData;
+    if (fDataSource != DataSource::Database){ 
+      return fData.at(0);
+    }
+    if (auto h = fData.at(ts)) {
+      return h;
     }
 
     mf::LogInfo("DetPedestalRetrievalAlg") << "DetPedestalRetrievalAlg::DBUpdate called with new timestamp.";
-    fCurrentTimeStamp = ts;
 
     auto const dataset = fDBFolder.GetDataset(ts);
 
@@ -132,13 +133,14 @@ namespace lariov {
                      dataset.GetDataAsFloat(channel, "rms_err")};
       data.AddOrReplaceRow(pd);
     }
-
-    return fData = data;
+    //SS: there may be  a better place for this cleanup call, TBD
+    fData.drop_unused();
+    return fData.emplace(ts, data);
   }
 
   const DetPedestal& DetPedestalRetrievalAlg::Pedestal(DBTimeStamp_t ts, DBChannelID_t ch) const
   {
-    return DBUpdate(ts).GetRow(ch);
+    return DBUpdate(ts)->GetRow(ch);
   }
 
   float DetPedestalRetrievalAlg::PedMean(DBTimeStamp_t ts, DBChannelID_t ch) const

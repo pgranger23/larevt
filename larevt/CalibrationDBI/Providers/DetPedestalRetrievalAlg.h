@@ -26,6 +26,7 @@
 #include "larevt/CalibrationDBI/Providers/DBFolder.h"
 
 #include "fhiclcpp/fwd.h"
+#include "hep_concurrency/cache.h"
 
 namespace lariov {
 
@@ -77,20 +78,20 @@ namespace lariov {
       static constexpr const char* FIELD_TYPES[NCOLUMNS]
         = {"unsigned int", "float", "float", "float", "float"};
 
+      using cache_t = hep::concurrency::cache<DBTimeStamp_t, Snapshot<DetPedestal>>;
+      using handle_t = cache_t::handle;
     private:
 
       /// Do actual database updates.
-
-      Snapshot<DetPedestal> const& DBUpdate(DBTimeStamp_t ts) const;
+      handle_t DBUpdate(DBTimeStamp_t ts) const;
 
       DBFolder fDBFolder;
 
       // Time stamps.
 
-      mutable DBTimeStamp_t fCurrentTimeStamp;  // Time stamp of cached data.
 
       DataSource::ds fDataSource;
-      mutable Snapshot<DetPedestal> fData;
+      mutable cache_t fData;
       const DetPedestal& Pedestal(DBTimeStamp_t ts, DBChannelID_t ch) const;
   };
 }//end namespace lariov
