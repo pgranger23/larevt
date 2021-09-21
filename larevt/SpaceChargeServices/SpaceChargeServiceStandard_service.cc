@@ -17,7 +17,7 @@
 #include "art/Framework/Principal/Run.h" // for Run
 #include "art/Framework/Services/Registry/ActivityRegistry.h"
 #include "art/Framework/Services/Registry/GlobalSignal.h"
-#include "art/Framework/Services/Registry/ServiceMacros.h"
+#include "art/Framework/Services/Registry/ServiceDefinitionMacros.h"
 #include "canvas/Persistency/Provenance/RunID.h"
 
 //-----------------------------------------------

@@ -17,7 +17,7 @@
 #include "larevt/CalibrationDBI/Interface/ChannelStatusProvider.h"
 
 // Framework libraries
-#include "art/Framework/Services/Registry/ServiceMacros.h"
+#include "art/Framework/Services/Registry/ServiceDeclarationMacros.h"
 
 //forward declarations
 namespace lariov {

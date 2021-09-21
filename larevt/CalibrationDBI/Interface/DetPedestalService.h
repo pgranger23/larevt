@@ -1,8 +1,7 @@
 #ifndef DETPEDESTALSERVICE_H
 #define DETPEDESTALSERVICE_H
 
-#include "art/Framework/Services/Registry/ServiceMacros.h"
-
+#include "art/Framework/Services/Registry/ServiceDeclarationMacros.h"
 #include "larcore/CoreUtils/ServiceUtil.h" // unused; for includer's convenience
 
 //forward declarations
