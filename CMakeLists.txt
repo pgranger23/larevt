@@ -41,6 +41,7 @@ find_ups_root()
 find_ups_product( postgresql )
 find_ups_product( libwda )
 find_ups_product(clhep)
+find_ups_product(sqlite)
 
 # macros for dictionary and simple_plugin
 include(ArtDictionary)
