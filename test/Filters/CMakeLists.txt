@@ -6,7 +6,6 @@ simple_plugin ( SimpleChannelStatusTest "module"
                     
                     fhiclcpp::fhiclcpp
                     cetlib::cetlib cetlib_except
-                    ${ROOT_BASIC_LIB_LIST}
               )
 
 cet_test(ChannelStatusServiceTest HANDBUILT
