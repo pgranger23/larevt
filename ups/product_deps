@@ -6,7 +6,7 @@ defaultqual	e20
 fcldir product_dir job
 #
 product         version
-lardata		v09_04_00
+lardata		v09_04_01
 libwda          v2_29_1
 cetbuildtools	v8_18_05	-	only_for_build
 end_product_list
