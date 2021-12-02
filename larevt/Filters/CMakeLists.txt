@@ -18,7 +18,7 @@ art_make(LIB_LIBRARIES
            lardataalg_DetectorInfo
            larcorealg_Geometry
            lardataobj_RawData
-           nusimdata_SimulationBase
+           nusimdata::SimulationBase
          SERVICE_LIBRARIES
            larevt_Filters
            messagefacility::MF_MessageLogger
