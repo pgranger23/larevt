@@ -13,35 +13,30 @@ project(larevt VERSION 09.03.06 LANGUAGES CXX)
 # cetbuildtools contains our cmake modules
 find_package(cetbuildtools REQUIRED)
 
-list(APPEND CMAKE_MODULE_PATH $ENV{CANVAS_ROOT_IO_DIR}/Modules $ENV{ART_DIR}/Modules)
-
 include(CetCMakeEnv)
 cet_cmake_env()
 
 cet_set_compiler_flags(DIAGS CAUTIOUS
   WERROR
   NO_UNDEFINED
-  EXTRA_FLAGS -pedantic -Wno-unused-local-typedefs -I $ENV{CLANG_FQ_DIR}/include/c++/v1
+  EXTRA_FLAGS -pedantic -Wno-unused-local-typedefs
 )
 
 cet_report_compiler_flags()
 
-# these are minimum required versions, not the actual product versions
+find_package(messagefacility REQUIRED PUBLIC)
+find_package(canvas_root_io REQUIRED)
+find_package(art REQUIRED PUBLIC)
+find_package(art_root_io REQUIRED PUBLIC)
+find_package(nusimdata REQUIRED PUBLIC)
+find_package(ROOT COMPONENTS Core RIO Hist MathCore Physics REQUIRED PUBLIC)
+
 find_ups_product( larcoreobj )
 find_ups_product( larcorealg )
 find_ups_product( larcore )
 find_ups_product( lardataobj )
 find_ups_product( lardataalg )
 find_ups_product( lardata )
-find_ups_product( nusimdata )
-find_ups_product( art )
-find_ups_product(art_root_io)
-find_ups_product( messagefacility )
-find_ups_root()
-find_ups_product( postgresql )
-find_ups_product( libwda )
-find_ups_product(clhep)
-find_ups_product(sqlite)
 
 # macros for dictionary and simple_plugin
 include(ArtDictionary)

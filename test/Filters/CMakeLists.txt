@@ -1,5 +1,7 @@
 cet_enable_asserts()
 
+find_package(Boost REQUIRED)
+
 simple_plugin ( SimpleChannelStatusTest "module"
                     larevt_Filters
                     messagefacility::MF_MessageLogger
@@ -22,6 +24,3 @@ cet_test(SimpleChannelStatus_test
   USE_BOOST_UNIT
 )
 
-# install_headers()
-# install_fhicl()
-# install_source()

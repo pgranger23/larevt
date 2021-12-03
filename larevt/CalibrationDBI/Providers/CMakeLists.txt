@@ -1,12 +1,10 @@
-cet_find_library(LIBWDA NAMES wda PATHS ENV LIBWDA_LIB NO_DEFAULT_PATH)
-cet_find_library(SQLITE NAMES sqlite3_ups PATHS ENV SQLITE_LIB NO_DEFAULT_PATH)
 
-include_directories($ENV{LIBWDA_FQ_DIR}/include)
+find_package(libwda REQUIRED PUBLIC)
 
 art_make(LIB_LIBRARIES
            larevt_CalibrationDBI_IOVData
-           LIBWDA
-           SQLITE
+           wda::wda
+           SQLite::SQLite3
            messagefacility::MF_MessageLogger
            fhiclcpp::fhiclcpp
            canvas::canvas
