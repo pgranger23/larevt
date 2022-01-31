@@ -20,6 +20,8 @@
 #include "larevt/CalibrationDBI/IOVData/IOVDataConstants.h"
 #include "larevt/CalibrationDBI/Interface/CalibrationDBIFwd.h"
 
+#include "hep_concurrency/cache.h"
+
 // Utility libraries
 namespace fhicl { class ParameterSet; }
 
@@ -88,34 +90,25 @@ namespace lariov {
       ChannelSet_t NoisyChannels(DBTimeStamp_t ts) const override;
       /// @}
 
-
-      /// Update event time stamp.
-      void UpdateTimeStamp(DBTimeStamp_t ts);
-
       /// Allows a service to add to the list of noisy channels
-      void AddNoisyChannel(DBTimeStamp_t ts, raw::ChannelID_t ch);
+      void AddNoisyChannels(DBTimeStamp_t ts, std::vector<raw::ChannelID_t> ch);
 
       ///@}
-
-
+      using cache_t = hep::concurrency::cache<DBTimeStamp_t, Snapshot<ChannelStatus>>;
+      using handle_t = cache_t::handle;
 
     private:
 
       /// Do actual database updates.
 
-      Snapshot<ChannelStatus> const& DBUpdate(DBTimeStamp_t ts) const;
-      Snapshot<ChannelStatus> const& GetNoisyData(DBTimeStamp_t ts) const;
+      handle_t DBUpdate(DBTimeStamp_t ts) const;
+      handle_t GetNoisyData(DBTimeStamp_t ts) const;
       ChannelStatusDataPtr GetData(DBTimeStamp_t ts) const;
 
       DBFolder fDBFolder;
-
-      // Time stamps.
-
-      mutable DBTimeStamp_t fCurrentTimeStamp;  // Time stamp of cached data.
-
       DataSource::ds fDataSource;
-      mutable Snapshot<ChannelStatus> fData;    // Lazily updated once per IOV.
-      Snapshot<ChannelStatus> fNewNoisy;        // Updated once per event.
+      mutable cache_t fData;                 //using concurrent caching
+      mutable cache_t fNewNoisy;            
 
 
   }; // class SIOVChannelStatusProvider

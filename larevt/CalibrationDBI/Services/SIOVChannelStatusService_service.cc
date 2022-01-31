@@ -1,4 +1,3 @@
-#include "art/Framework/Services/Registry/ActivityRegistry.h"
 #include "art/Framework/Services/Registry/ServiceDefinitionMacros.h"
 #include "art/Framework/Principal/Event.h"
 #include "art/Persistency/Provenance/ScheduleContext.h"
@@ -18,9 +17,7 @@ namespace lariov{
 
     public:
 
-      SIOVChannelStatusService(fhicl::ParameterSet const& pset, art::ActivityRegistry& reg);
-
-      void PreProcessEvent(const art::Event& evt, art::ScheduleContext);
+      SIOVChannelStatusService(fhicl::ParameterSet const& pset);
 
     private:
 
@@ -41,21 +38,9 @@ DECLARE_ART_SERVICE_INTERFACE_IMPL(lariov::SIOVChannelStatusService, lariov::Cha
 
 namespace lariov{
 
-  SIOVChannelStatusService::SIOVChannelStatusService(fhicl::ParameterSet const& pset, art::ActivityRegistry& reg)
+  SIOVChannelStatusService::SIOVChannelStatusService(fhicl::ParameterSet const& pset)
   : fProvider(pset.get<fhicl::ParameterSet>("ChannelStatusProvider"))
-  {
-
-    //register callback to update local database cache before each event is processed
-    reg.sPreProcessEvent.watch(this, &SIOVChannelStatusService::PreProcessEvent);
-
-  }
-
-
-  void SIOVChannelStatusService::PreProcessEvent(const art::Event& evt, art::ScheduleContext) {
-
-    //First grab an update from the database
-    fProvider.UpdateTimeStamp(evt.time().value());
-  }
+  {}
 
 }//end namespace lariov
 

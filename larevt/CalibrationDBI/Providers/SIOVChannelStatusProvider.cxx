@@ -21,29 +21,29 @@
 #include <fstream>
 
 namespace lariov {
-
+     using handle_t = SIOVChannelStatusProvider::handle_t;
      /// Converts LArSoft channel ID in the one proper for the DB
      static DBChannelID_t rawToDBChannel(raw::ChannelID_t channel)
        { return DBChannelID_t(channel); }
 
 class SIOVChannelStatusData : public ChannelStatusData {
 public:
-  SIOVChannelStatusData(Snapshot<ChannelStatus> const& noisy,
-                        Snapshot<ChannelStatus> const& dbdata, 
-                        DataSource::ds datasource)
+  SIOVChannelStatusData() = default;
+  SIOVChannelStatusData( SIOVChannelStatusProvider::handle_t noisy,
+                         SIOVChannelStatusProvider::handle_t dbdata)
       : fNoisyData(noisy), 
         fDBdata(dbdata),
-        fDataSource(datasource) 
+        fUseDefault(fNoisyData && fDBdata) 
         {}
 
   ChannelStatus GetChannelStatus(raw::ChannelID_t ch) const {
-   if (fDataSource == DataSource::Default) {
+   if (fUseDefault) {
       return ChannelStatus{0, kGOOD};
     }
-    if (fNoisyData.HasChannel(rawToDBChannel(ch))) {
-      return fNoisyData.GetRow(rawToDBChannel(ch));
+    if (fNoisyData && fNoisyData->HasChannel(rawToDBChannel(ch))) {
+      return fNoisyData->GetRow(rawToDBChannel(ch));
     }
-    return fDBdata.GetRow(rawToDBChannel(ch));
+    return fDBdata->GetRow(rawToDBChannel(ch));
   }
 
   ChannelSet_t GoodChannels() const {
@@ -63,13 +63,13 @@ public:
 }
 
   ChannelSet_t GetChannelsWithStatus(chStatus status) const {
-    if (fDataSource == DataSource::Default && status != kGOOD) {
+    if (fUseDefault && status != kGOOD) {
       return {};
     }
     ChannelSet_t retSet;
     DBChannelID_t maxChannel = art::ServiceHandle<geo::Geometry const>()->Nchannels() - 1;
     for (DBChannelID_t ch=0; ch != maxChannel; ++ch) {
-     if (fDataSource == DataSource::Default || this->GetChannelStatus(ch).Status() == status) {
+     if (fUseDefault || this->GetChannelStatus(ch).Status() == status) {
        retSet.insert(ch);
        }
     }
@@ -77,14 +77,13 @@ public:
   }
 
 private:
-  Snapshot<ChannelStatus> const& fNoisyData;
-  Snapshot<ChannelStatus> const& fDBdata;
-  DataSource::ds fDataSource;
+   SIOVChannelStatusProvider::handle_t fNoisyData{handle_t::invalid()};
+   SIOVChannelStatusProvider::handle_t fDBdata = handle_t::invalid();
+  bool fUseDefault = false;
 };
   //----------------------------------------------------------------------------
   SIOVChannelStatusProvider::SIOVChannelStatusProvider(fhicl::ParameterSet const& pset)
     : fDBFolder(pset.get<fhicl::ParameterSet>("DatabaseRetrievalAlg"))
-    , fCurrentTimeStamp(0)
   {
     bool UseDB    = pset.get<bool>("UseDB", false);
     bool UseFile  = pset.get<bool>("UseFile", false);
@@ -95,6 +94,11 @@ private:
     if ( UseDB )      fDataSource = DataSource::Database;
     else if (UseFile) fDataSource = DataSource::File;
     else              fDataSource = DataSource::Default;
+
+    Snapshot<ChannelStatus> snapshot;
+    IOVTimeStamp tmp = IOVTimeStamp::MaxTimeStamp();
+    tmp.SetStamp(tmp.Stamp()-1, tmp.SubStamp());
+    snapshot.SetIoV(tmp, IOVTimeStamp::MaxTimeStamp());
 
     if (fDataSource == DataSource::Default) {
       std::cout << "Using default channel status value: "<< kGOOD <<"\n";
@@ -114,34 +118,28 @@ private:
         DBChannelID_t ch = std::stoi(line.substr(0, line.find(',')));
         int status = std::stoi(line.substr(line.find(',')+1));
         ChannelStatus cs{ch, status};
-        fData.AddOrReplaceRow(cs);
+        snapshot.AddOrReplaceRow(cs);
       }
+      fData.emplace(0, std::move(snapshot));
     } // if source from file
     else {
       std::cout << "Using channel statuses from conditions database\n";
     }
   }
-
-  // This method saves the time stamp of the latest event.
-
-  void SIOVChannelStatusProvider::UpdateTimeStamp(DBTimeStamp_t ts) {
-    mf::LogInfo("SIOVChannelStatusProvider") << "SIOVChannelStatusProvider::UpdateTimeStamp called.";
-    fNewNoisy.Clear();
-  }
-
   // Maybe update method cached data (private const version).
   // This is the function that does the actual work of updating data from database.
 
-  Snapshot<ChannelStatus> const&
+  SIOVChannelStatusProvider::handle_t
   SIOVChannelStatusProvider::DBUpdate(DBTimeStamp_t ts) const
   {
-    if (fDataSource != DataSource::Database or ts == fCurrentTimeStamp) {
-      return fData;
+    if (fDataSource != DataSource::Database) { 
+      return fData.at(0);
+    }
+    if (auto h = fData.at(ts)) {
+      return h;
     }
 
     mf::LogInfo("SIOVChannelStatusProvider") << "SIOVChannelStatusProvider::DBUpdate called with new timestamp.";
-
-    fCurrentTimeStamp = ts;
 
     auto const dataset = fDBFolder.GetDataset(ts);
 
@@ -153,20 +151,21 @@ private:
     }
     // SS: we will be entering a new entery into the cache
     // and return it
-    return fData = data;
+    fData.drop_unused();
+    return fData.emplace(ts, data);
   }
 
 // Get noisy data
-  Snapshot<ChannelStatus> const&
+  SIOVChannelStatusProvider::handle_t
   SIOVChannelStatusProvider::GetNoisyData(DBTimeStamp_t ts) const {
-    return fNewNoisy; 
+    return fNewNoisy.at(ts); 
   }
 
   ChannelStatusDataPtr
   SIOVChannelStatusProvider::GetData(DBTimeStamp_t ts) const {
-   auto const& noisydata = GetNoisyData(ts);
-   auto const& dbdata = DBUpdate(ts);
-   return std::make_shared<SIOVChannelStatusData>(noisydata, dbdata, fDataSource); 
+   if ( fDataSource == DataSource::Default) 
+     return std::make_shared<SIOVChannelStatusData>(); 
+   return std::make_shared<SIOVChannelStatusData>(GetNoisyData(ts), DBUpdate(ts)); 
   }
 
   //----------------------------------------------------------------------------
@@ -194,13 +193,15 @@ private:
 
 
   //----------------------------------------------------------------------------
-  void SIOVChannelStatusProvider::AddNoisyChannel(DBTimeStamp_t ts, raw::ChannelID_t ch)
+  void SIOVChannelStatusProvider::AddNoisyChannels(DBTimeStamp_t ts, std::vector<raw::ChannelID_t> channels)
   {
-    ChannelStatus cs{rawToDBChannel(ch), kNOISY};
-    fNewNoisy.AddOrReplaceRow(cs);
+    Snapshot<ChannelStatus> snapshot;
+    for (auto const ch: channels) {
+      ChannelStatus cs{rawToDBChannel(ch), kNOISY};
+      snapshot.AddOrReplaceRow(cs);
+    }
+    fNewNoisy.emplace(ts, std::move(snapshot));
   }
-
-
 
   //----------------------------------------------------------------------------
 
