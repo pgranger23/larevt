@@ -9,7 +9,7 @@ simple_plugin(CalWireAna "module"
 	      messagefacility::MF_MessageLogger
               ROOT::Core
               ROOT::Hist
-              ROOT::MathCore)
+              ROOT::MathCore) ### MIGRATE-ACTION-RECOMMENDED (migrate-3.09.03) - deprecated: use cet_build_plugin() with explicit source lists and plugin base types
 
 simple_plugin(CalWire "module"
               larcorealg_Geometry
@@ -20,7 +20,7 @@ simple_plugin(CalWire "module"
               ROOT::Core
               ROOT::Hist
               ROOT::MathCore
-              ROOT::RIO)
+              ROOT::RIO) ### MIGRATE-ACTION-RECOMMENDED (migrate-3.09.03) - deprecated: use cet_build_plugin() with explicit source lists and plugin base types
 
 simple_plugin(CalWireT962 "module"
               larcorealg_Geometry
@@ -31,7 +31,7 @@ simple_plugin(CalWireT962 "module"
               ROOT::Core
               ROOT::Hist
               ROOT::MathCore
-              ROOT::RIO)
+              ROOT::RIO) ### MIGRATE-ACTION-RECOMMENDED (migrate-3.09.03) - deprecated: use cet_build_plugin() with explicit source lists and plugin base types
 
 install_headers()
 install_fhicl()

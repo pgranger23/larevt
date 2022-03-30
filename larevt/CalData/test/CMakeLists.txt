@@ -14,7 +14,7 @@ simple_plugin(FFTTest "module"
 	                fhiclcpp::fhiclcpp
 			cetlib::cetlib cetlib_except
 
-)
+) ### MIGRATE-ACTION-RECOMMENDED (migrate-3.09.03) - deprecated: use cet_build_plugin() with explicit source lists and plugin base types
 
 install_headers()
 install_fhicl()
