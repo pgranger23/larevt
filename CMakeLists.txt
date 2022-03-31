@@ -10,7 +10,7 @@ cmake_minimum_required(VERSION 3.20 FATAL_ERROR)
 # cmake_policy(VERSION 3.19) ### MIGRATE-ACTION-COMPATIBILITY (migrate-3.09.03) - Uncomment to preserve compatibility with older CMake versions
 
 find_package(cetmodules REQUIRED)
-project(larevt VERSION 09.04.05 LANGUAGES CXX)
+project(larevt VERSION 09.04.06 LANGUAGES CXX)
 
 # cetbuildtools contains our cmake modules
 
