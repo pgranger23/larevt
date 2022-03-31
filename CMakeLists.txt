@@ -7,7 +7,6 @@
 # ======================================================================
 
 cmake_minimum_required(VERSION 3.20 FATAL_ERROR)
-# cmake_policy(VERSION 3.19) ### MIGRATE-ACTION-COMPATIBILITY (migrate-3.09.03) - Uncomment to preserve compatibility with older CMake versions
 
 find_package(cetmodules REQUIRED)
 project(larevt VERSION 09.04.06 LANGUAGES CXX)
@@ -23,16 +22,17 @@ cet_set_compiler_flags(DIAGS CAUTIOUS
   EXTRA_FLAGS -pedantic -Wno-unused-local-typedefs
 )
 
-cet_report_compiler_flags() ### MIGRATE-ACTION-RECOMMENDED (migrate-3.09.03) - add args: REPORT_THRESHOLD VERBOSE
+cet_report_compiler_flags(REPORT_THRESHOLD VERBOSE)
 
 find_package(messagefacility REQUIRED EXPORT)
 find_package(canvas_root_io REQUIRED)
+find_package(cetlib_except REQUIRED EXPORT)
 find_package(art REQUIRED EXPORT)
 find_package(art_root_io REQUIRED EXPORT)
 find_package(nusimdata REQUIRED EXPORT)
 find_package(ROOT COMPONENTS Core RIO Hist MathCore Physics REQUIRED EXPORT)
 
-find_package( larcoreobj REQUIRED )
+find_package( larcoreobj REQUIRED EXPORT)
 find_package( larcorealg REQUIRED )
 find_package( larcore REQUIRED )
 find_package( lardataobj REQUIRED )
@@ -41,8 +41,10 @@ find_package( lardata REQUIRED )
 
 # macros for dictionary and simple_plugin
 include(ArtDictionary)
-include(ArtMake)
+include(CetMakeLibrary)
 include(BuildPlugins)
+
+cet_cmake_module_directories(Modules BINARY)
 
 # source
 add_subdirectory(larevt)

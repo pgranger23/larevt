@@ -1,9 +1,28 @@
-art_make(SERVICE_LIBRARIES
-           larevt_CalibrationDBI_Providers
-           larevt_CalibrationDBI_IOVData
-           art::Framework_Services_Registry
-           art::Framework_Principal
-         ) ### MIGRATE-ACTION-RECOMMENDED (migrate-3.09.03) - deprecated: use art_make_library(), art_dictonary(), and cet_build_plugin() with explicit source lists and plugin base types
+include(lar::CalibrationDBIServiceBuilders)
+
+cet_build_plugin(SIOVChannelStatusService lar::ChannelStatusService
+  LIBRARIES PRIVATE
+  larevt::CalibrationDBI_Providers
+  art::Framework_Principal
+  )
+
+cet_build_plugin(SIOVDetPedestalService lar::DetPedestalService
+  LIBRARIES PRIVATE
+  larevt::CalibrationDBI_Providers
+  art::Framework_Principal
+  )
+
+cet_build_plugin(SIOVElectronicsCalibService lar::ElectronicsCalibService
+  LIBRARIES PRIVATE
+  larevt::CalibrationDBI_Providers
+  art::Framework_Principal
+  )
+
+cet_build_plugin(SIOVPmtGainService lar::PmtGainService
+  LIBRARIES PRIVATE
+  larevt::CalibrationDBI_Providers
+  art::Framework_Principal
+  )
 
 install_headers()
 install_source()

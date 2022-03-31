@@ -1,14 +1,11 @@
 cet_enable_asserts()
 
-find_package(Boost REQUIRED)
-
-simple_plugin ( SimpleChannelStatusTest "module"
-                    larevt_Filters
-                    messagefacility::MF_MessageLogger
-                    
-                    fhiclcpp::fhiclcpp
-                    cetlib::cetlib cetlib_except
-              ) ### MIGRATE-ACTION-RECOMMENDED (migrate-3.09.03) - deprecated: use cet_build_plugin() with explicit source lists and plugin base types
+cet_build_plugin(SimpleChannelStatusTest art::EDAnalyzer
+  LIBRARIES PRIVATE
+  larevt::ChannelStatusProvider
+  larevt::ChannelStatusService
+  larevt::Filters
+  )
 
 cet_test(ChannelStatusServiceTest HANDBUILT
   DATAFILES test_channel_status.fcl

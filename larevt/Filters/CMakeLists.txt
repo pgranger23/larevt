@@ -1,29 +1,72 @@
-art_make(LIB_LIBRARIES
-           larcorealg_Geometry
-           lardataobj_RecoBase
-           art::Framework_Services_Registry
-           canvas::canvas
-           messagefacility::MF_MessageLogger
-           fhiclcpp::fhiclcpp
-           cetlib_except::cetlib_except
-         MODULE_LIBRARIES
-           lardata_Utilities
-           art::Framework_Services_Registry
-           art_root_io::TFileService_service
-           art_root_io::tfile_support
-           messagefacility::MF_MessageLogger
-           ROOT::Core
-           ROOT::Hist
-           ROOT::Physics
-           lardataalg_DetectorInfo
-           larcorealg_Geometry
-           lardataobj_RawData
-           nusimdata::SimulationBase
-         SERVICE_LIBRARIES
-           larevt_Filters
-           messagefacility::MF_MessageLogger
-           ROOT::Core
-         ) ### MIGRATE-ACTION-RECOMMENDED (migrate-3.09.03) - deprecated: use art_make_library(), art_dictonary(), and cet_build_plugin() with explicit source lists and plugin base types
+include(lar::CalibrationDBIServiceBuilders)
+
+cet_make_library(
+  SOURCE
+  ChannelFilter.cxx
+  SimpleChannelStatus.cpp
+  LIBRARIES
+  PUBLIC
+  larevt::ChannelStatusProvider
+  PRIVATE
+  larevt::ChannelStatusService
+  art::Framework_Services_Registry
+  canvas::canvas
+  messagefacility::MF_MessageLogger
+  fhiclcpp::fhiclcpp
+  cetlib::container_algorithms
+  cetlib_except::cetlib_except
+)
+
+cet_build_plugin(ADCFilter art::EDFilter
+  LIBRARIES PRIVATE
+  larevt::ChannelStatusService
+  larevt::ChannelStatusProvider
+  lardataobj::RawData
+  )
+cet_build_plugin(EventFilter art::EDFilter)
+cet_build_plugin(EventTimeFilter art::EDFilter
+  LIBRARIES PRIVATE
+  ROOT::Core
+  ROOT::MathCore
+  )
+cet_build_plugin(FinalStateParticleFilter art::EDFilter
+  LIBRARIES PRIVATE
+  nusimdata::SimulationBase
+  art_root_io::TFileService_service
+  art::Framework_Services_Registry
+  canvas::canvas
+  ROOT::Hist
+  )
+cet_build_plugin(LArG4ParticleFilter art::EDFilter
+  LIBRARIES PRIVATE
+  larcore::Geometry_Geometry_service
+  larcoreobj::headers
+  nusimdata::SimulationBase
+  art::Framework_Services_Registry
+  ROOT::Physics
+  )
+cet_build_plugin(MuonFilter art::EDFilter
+  LIBRARIES PRIVATE
+  lardata::DetectorClocksService
+  lardata::DetectorPropertiesService
+  larcore::Geometry_Geometry_service
+  larcorealg::Geometry
+  lardataobj::RecoBase
+  messagefacility::MF_MessageLogger
+  canvas::canvas
+  ROOT::MathCore
+  )
+cet_build_plugin(SmallClusterFilter art::EDFilter
+  LIBRARIES PRIVATE
+  larcore::Geometry_Geometry_service
+  lardata::Utilities
+  lardataobj::RecoBase
+  )
+cet_build_plugin(SimpleChannelStatusService lar::ChannelStatusService
+  LIBRARIES
+  PUBLIC larevt::Filters
+  PRIVATE larcore::Geometry_Geometry_service
+  )
 
 install_headers()
 install_fhicl()

@@ -9,13 +9,18 @@
 #ifndef SPACECHARGESERVICESTANDARD_H
 #define SPACECHARGESERVICESTANDARD_H
 
-#include "art/Framework/Principal/Run.h"
-#include "art/Framework/Services/Registry/ActivityRegistry.h"
-#include "art/Framework/Services/Registry/ServiceHandle.h"
 #include "art/Framework/Services/Registry/ServiceDeclarationMacros.h"
-#include "fhiclcpp/ParameterSet.h"
 #include "larevt/SpaceCharge/SpaceChargeStandard.h"
 #include "larevt/SpaceChargeServices/SpaceChargeService.h"
+
+namespace art {
+  class ActivityRegistry;
+  class Run;
+}
+
+namespace fhicl {
+  class ParameterSet;
+}
 
 namespace spacecharge {
   class SpaceChargeServiceStandard : public SpaceChargeService {

@@ -1,3 +1,8 @@
-art_make() ### MIGRATE-ACTION-RECOMMENDED (migrate-3.09.03) - deprecated: use art_make_library(), art_dictonary(), and cet_build_plugin() with explicit source lists and plugin base types
+cet_make_library(SOURCE
+  CalibrationExtraInfo.cxx
+  IOVTimeStamp.cxx
+  TimeStampDecoder.cxx
+  )
 
 install_headers()
+install_source()
