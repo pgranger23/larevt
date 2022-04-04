@@ -32,12 +32,11 @@ find_package(art_root_io REQUIRED EXPORT)
 find_package(nusimdata REQUIRED EXPORT)
 find_package(ROOT COMPONENTS Core RIO Hist MathCore Physics REQUIRED EXPORT)
 
-find_package( larcoreobj REQUIRED EXPORT)
-find_package( larcorealg REQUIRED )
-find_package( larcore REQUIRED )
-find_package( lardataobj REQUIRED )
-find_package( lardataalg REQUIRED )
-find_package( lardata REQUIRED )
+find_package(larcoreobj REQUIRED EXPORT)
+find_package(larcorealg REQUIRED EXPORT)
+find_package(larcore REQUIRED EXPORT)
+find_package(lardataobj REQUIRED EXPORT)
+find_package(lardata REQUIRED EXPORT)
 
 # macros for dictionary and simple_plugin
 include(ArtDictionary)
