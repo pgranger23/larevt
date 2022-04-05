@@ -12,7 +12,7 @@ cet_build_plugin(CalWireAna art::EDAnalyzer
   ROOT::MathCore
   )
 
-simple_plugin(CalWire art::EDProducer
+cet_build_plugin(CalWire art::EDProducer
   LIBRARIES PRIVATE
   larcoreobj::headers
   larcorealg::Geometry
@@ -27,7 +27,7 @@ simple_plugin(CalWire art::EDProducer
   ROOT::RIO
   )
 
-simple_plugin(CalWireT962 art::EDProducer
+cet_build_plugin(CalWireT962 art::EDProducer
   LIBRARIES PRIVATE
   larcoreobj::headers
   larcorealg::Geometry
