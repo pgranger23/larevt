@@ -15,9 +15,10 @@ cet_test(ChannelStatusServiceTest HANDBUILT
 
 cet_test(SimpleChannelStatus_test
   SOURCE SimpleChannelStatus_test.cxx
-  LIBRARIES larevt_Filters
-            larevt_CalibrationDBI_IOVData
-            fhiclcpp::fhiclcpp
+  LIBRARIES PRIVATE
+  larevt::Filters
+  larevt::CalibrationDBI_IOVData
+  fhiclcpp::fhiclcpp
   USE_BOOST_UNIT
 )
 
