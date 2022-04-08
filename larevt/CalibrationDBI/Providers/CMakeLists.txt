@@ -24,6 +24,7 @@ cet_make_library(
   cetlib::cetlib
   cetlib_except::cetlib_except
   larcorealg::Geometry
+  larcore::Geometry_Geometry_service
   art::Framework_Services_Registry
   ROOT::Core
   wda::wda
