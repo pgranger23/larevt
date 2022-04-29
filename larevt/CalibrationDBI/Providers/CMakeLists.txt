@@ -1,5 +1,3 @@
-find_package(libwda REQUIRED EXPORT)
-
 cet_make_library(
   SOURCE
   DBDataset.cxx
@@ -30,7 +28,7 @@ cet_make_library(
   wda::wda
   SQLite::SQLite3
   art::Utilities
-  )
+)
 
 install_headers()
 install_source()

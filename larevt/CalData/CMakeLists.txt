@@ -10,7 +10,7 @@ cet_build_plugin(CalWireAna art::EDAnalyzer
   art_root_io::TFileService_service
   ROOT::Hist
   ROOT::MathCore
-  )
+)
 
 cet_build_plugin(CalWire art::EDProducer
   LIBRARIES PRIVATE
@@ -25,7 +25,7 @@ cet_build_plugin(CalWire art::EDProducer
   ROOT::Hist
   ROOT::MathCore
   ROOT::RIO
-  )
+)
 
 cet_build_plugin(CalWireT962 art::EDProducer
   LIBRARIES PRIVATE
@@ -40,7 +40,7 @@ cet_build_plugin(CalWireT962 art::EDProducer
   ROOT::Hist
   ROOT::MathCore
   ROOT::RIO
-  )
+)
 
 install_headers()
 install_fhicl()

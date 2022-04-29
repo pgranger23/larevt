@@ -8,7 +8,7 @@
 
 cmake_minimum_required(VERSION 3.20 FATAL_ERROR)
 
-find_package(cetmodules REQUIRED)
+find_package(cetmodules 3.12.00 REQUIRED)
 project(larevt VERSION 09.05.01 LANGUAGES CXX)
 
 # cetbuildtools contains our cmake modules
@@ -24,19 +24,26 @@ cet_set_compiler_flags(DIAGS CAUTIOUS
 
 cet_report_compiler_flags(REPORT_THRESHOLD VERBOSE)
 
-find_package(messagefacility REQUIRED EXPORT)
-find_package(canvas_root_io REQUIRED)
-find_package(cetlib_except REQUIRED EXPORT)
-find_package(art REQUIRED EXPORT)
-find_package(art_root_io REQUIRED EXPORT)
 find_package(nusimdata REQUIRED EXPORT)
-find_package(ROOT COMPONENTS Core RIO Hist MathCore Physics REQUIRED EXPORT)
 
-find_package(larcoreobj REQUIRED EXPORT)
-find_package(larcorealg REQUIRED EXPORT)
+find_package(art_root_io REQUIRED EXPORT)
+find_package(canvas_root_io REQUIRED)
+find_package(art REQUIRED EXPORT)
+find_package(canvas REQUIRED EXPORT)
+find_package(messagefacility REQUIRED EXPORT)
+find_package(fhiclcpp REQUIRED EXPORT)
+find_package(cetlib REQUIRED EXPORT)
+find_package(cetlib_except REQUIRED EXPORT)
+
+find_package(ROOT COMPONENTS Core Hist MathCore Physics RIO REQUIRED EXPORT)
+find_package(SQLite3 REQUIRED EXPORT)
+find_package(libwda REQUIRED EXPORT)
+
 find_package(larcore REQUIRED EXPORT)
-find_package(lardataobj REQUIRED EXPORT)
+find_package(larcorealg REQUIRED EXPORT)
+find_package(larcoreobj REQUIRED EXPORT)
 find_package(lardata REQUIRED EXPORT)
+find_package(lardataobj REQUIRED EXPORT)
 
 # macros for dictionary and simple_plugin
 include(ArtDictionary)

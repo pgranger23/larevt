@@ -1,5 +1,4 @@
-cet_make_library(
-  SOURCE SpaceChargeStandard.cxx
+cet_make_library(SOURCE SpaceChargeStandard.cxx
   LIBRARIES
   PUBLIC
   larcoreobj::geo_vectors
@@ -10,7 +9,7 @@ cet_make_library(
   ROOT::Core
   ROOT::Hist
   ROOT::RIO
-  )
+)
 
 install_headers()
 install_fhicl()

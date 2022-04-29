@@ -22,13 +22,13 @@ cet_build_plugin(ADCFilter art::EDFilter
   larevt::ChannelStatusService
   larevt::ChannelStatusProvider
   lardataobj::RawData
-  )
+)
 cet_build_plugin(EventFilter art::EDFilter)
 cet_build_plugin(EventTimeFilter art::EDFilter
   LIBRARIES PRIVATE
   ROOT::Core
   ROOT::MathCore
-  )
+)
 cet_build_plugin(FinalStateParticleFilter art::EDFilter
   LIBRARIES PRIVATE
   nusimdata::SimulationBase
@@ -36,7 +36,7 @@ cet_build_plugin(FinalStateParticleFilter art::EDFilter
   art::Framework_Services_Registry
   canvas::canvas
   ROOT::Hist
-  )
+)
 cet_build_plugin(LArG4ParticleFilter art::EDFilter
   LIBRARIES PRIVATE
   larcore::Geometry_Geometry_service
@@ -44,7 +44,7 @@ cet_build_plugin(LArG4ParticleFilter art::EDFilter
   nusimdata::SimulationBase
   art::Framework_Services_Registry
   ROOT::Physics
-  )
+)
 cet_build_plugin(MuonFilter art::EDFilter
   LIBRARIES PRIVATE
   lardata::DetectorClocksService
@@ -55,18 +55,21 @@ cet_build_plugin(MuonFilter art::EDFilter
   messagefacility::MF_MessageLogger
   canvas::canvas
   ROOT::MathCore
-  )
+)
 cet_build_plugin(SmallClusterFilter art::EDFilter
   LIBRARIES PRIVATE
   larcore::Geometry_Geometry_service
   lardata::Utilities
   lardataobj::RecoBase
-  )
+)
 cet_build_plugin(SimpleChannelStatusService lar::ChannelStatusService
   LIBRARIES
-  PUBLIC larevt::Filters
-  PRIVATE larcore::Geometry_Geometry_service
-  )
+  PUBLIC
+  larevt::Filters
+  PRIVATE
+  larcore::Geometry_Geometry_service
+  messagefacility::MF_MessageLogger
+)
 
 install_headers()
 install_fhicl()

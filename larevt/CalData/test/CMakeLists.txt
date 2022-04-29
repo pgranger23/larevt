@@ -1,6 +1,6 @@
 cet_enable_asserts()
 
-cet_build_plugin(FFTTest art::EDAnalyzer
+cet_build_plugin(FFTTest art::EDAnalyzer NO_INSTALL
   LIBRARIES PRIVATE
 	lardata::Utilities_LArFFT_service
 	art::Framework_Services_Registry
