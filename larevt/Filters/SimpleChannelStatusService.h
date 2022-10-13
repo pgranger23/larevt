@@ -16,6 +16,7 @@
 #include "larevt/Filters/SimpleChannelStatus.h"
 #include "larevt/CalibrationDBI/Interface/ChannelStatusService.h"
 #include "art/Framework/Services/Registry/ServiceDeclarationMacros.h"
+#include "larcore/CoreUtils/EnsureOnlyOneSchedule.h"
 
 // C/C++ standard libraries
 #include <memory> //std::unique_ptr<>
@@ -46,7 +47,7 @@ namespace lariov {
    * - *service_type* (string): must be set to "SimpleChannelStatusService"
    *
    */
-  class SimpleChannelStatusService: public ChannelStatusService {
+  class SimpleChannelStatusService: public ChannelStatusService, private lar::EnsureOnlyOneSchedule<SimpleChannelStatusService> {
       public:
 
     /// Constructor: reads the channel IDs from the configuration
@@ -74,6 +75,6 @@ namespace lariov {
 } // namespace lariov
 
 DECLARE_ART_SERVICE_INTERFACE_IMPL
-  (lariov::SimpleChannelStatusService, lariov::ChannelStatusService, LEGACY)
+  (lariov::SimpleChannelStatusService, lariov::ChannelStatusService, SHARED)
 
 #endif // SIMPLECHANNELFILTERSERVICE_H

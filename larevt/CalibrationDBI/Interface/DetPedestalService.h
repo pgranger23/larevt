@@ -37,7 +37,7 @@ namespace lariov{
   };
 }//end namespace lariov
 
-DECLARE_ART_SERVICE_INTERFACE(lariov::DetPedestalService, LEGACY)
+DECLARE_ART_SERVICE_INTERFACE(lariov::DetPedestalService, SHARED)
 
 
 #endif

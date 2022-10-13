@@ -5,6 +5,7 @@
 #include "fhiclcpp/ParameterSet.h"
 #include "larevt/CalibrationDBI/Interface/ChannelStatusService.h"
 #include "larevt/CalibrationDBI/Providers/SIOVChannelStatusProvider.h"
+#include "larcore/CoreUtils/EnsureOnlyOneSchedule.h"
 
 namespace lariov{
 
@@ -14,7 +15,7 @@ namespace lariov{
      a channel status retrieval service for database scheme in which
      all elements in a database folder share a common interval of validity
   */
-  class SIOVChannelStatusService : public ChannelStatusService {
+  class SIOVChannelStatusService : public ChannelStatusService, private lar::EnsureOnlyOneSchedule<SIOVChannelStatusService> {
 
     public:
 
@@ -36,7 +37,7 @@ namespace lariov{
   };
 }//end namespace lariov
 
-DECLARE_ART_SERVICE_INTERFACE_IMPL(lariov::SIOVChannelStatusService, lariov::ChannelStatusService, LEGACY)
+DECLARE_ART_SERVICE_INTERFACE_IMPL(lariov::SIOVChannelStatusService, lariov::ChannelStatusService, SHARED)
 
 
 namespace lariov{

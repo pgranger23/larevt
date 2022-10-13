@@ -5,6 +5,7 @@
 #include "fhiclcpp/ParameterSet.h"
 #include "larevt/CalibrationDBI/Interface/DetPedestalService.h"
 #include "larevt/CalibrationDBI/Providers/DetPedestalRetrievalAlg.h"
+#include "larcore/CoreUtils/EnsureOnlyOneSchedule.h"
 
 namespace lariov{
 
@@ -14,7 +15,7 @@ namespace lariov{
      a detector pedestal retrieval service for database scheme in which
      all elements in a database folder share a common interval of validity
   */
-  class SIOVDetPedestalService : public DetPedestalService {
+  class SIOVDetPedestalService : public DetPedestalService, private lar::EnsureOnlyOneSchedule<SIOVDetPedestalService> {
 
     public:
 
@@ -35,7 +36,7 @@ namespace lariov{
   };
 }//end namespace lariov
 
-DECLARE_ART_SERVICE_INTERFACE_IMPL(lariov::SIOVDetPedestalService, lariov::DetPedestalService, LEGACY)
+DECLARE_ART_SERVICE_INTERFACE_IMPL(lariov::SIOVDetPedestalService, lariov::DetPedestalService, SHARED)
 
 
 namespace lariov{
