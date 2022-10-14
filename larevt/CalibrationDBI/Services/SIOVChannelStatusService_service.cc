@@ -55,7 +55,8 @@ namespace lariov{
   void SIOVChannelStatusService::PreProcessEvent(const art::Event& evt, art::ScheduleContext) {
 
     //First grab an update from the database
-    fProvider.UpdateTimeStamp(evt.time().value());
+    //fProvider.UpdateTimeStamp(evt.time().value());
+    fProvider.Update(evt.time().value());
   }
 
 }//end namespace lariov
