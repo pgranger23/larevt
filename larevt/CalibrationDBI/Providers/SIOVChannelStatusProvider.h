@@ -19,6 +19,8 @@
 #include "larevt/CalibrationDBI/IOVData/IOVDataConstants.h"
 #include "larevt/CalibrationDBI/Interface/CalibrationDBIFwd.h"
 
+class SIOVChannelStatusService;
+
 // Utility libraries
 namespace fhicl { class ParameterSet; }
 
@@ -35,6 +37,8 @@ namespace lariov {
    * SIOVChannelStatusService.
    */
   class SIOVChannelStatusProvider: public DatabaseRetrievalAlg, public ChannelStatusProvider {
+
+    friend class SIOVChannelStatusService;
 
     public:
 
@@ -94,6 +98,26 @@ namespace lariov {
       /// @}
 
 
+      /* /// Update event time stamp. */
+      /* void UpdateTimeStamp(DBTimeStamp_t ts); */
+
+      /* /// @name Configuration functions */
+      /* /// @{ */
+      /* /// Prepares the object to provide information about the specified time */
+      /* bool Update(DBTimeStamp_t); */
+
+      /* /// Allows a service to add to the list of noisy channels */
+      /* void AddNoisyChannel(raw::ChannelID_t ch); */
+
+      ///@}
+
+
+      /// Converts LArSoft channel ID in the one proper for the DB
+      static DBChannelID_t rawToDBChannel(raw::ChannelID_t channel)
+        { return DBChannelID_t(channel); }
+
+    private:
+
       /// Update event time stamp.
       void UpdateTimeStamp(DBTimeStamp_t ts);
 
@@ -104,15 +128,6 @@ namespace lariov {
 
       /// Allows a service to add to the list of noisy channels
       void AddNoisyChannel(raw::ChannelID_t ch);
-
-      ///@}
-
-
-      /// Converts LArSoft channel ID in the one proper for the DB
-      static DBChannelID_t rawToDBChannel(raw::ChannelID_t channel)
-        { return DBChannelID_t(channel); }
-
-    private:
 
       /// Do actual database updates.
 
