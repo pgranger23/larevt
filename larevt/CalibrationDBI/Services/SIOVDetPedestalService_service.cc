@@ -23,8 +23,8 @@ namespace lariov{
       ~SIOVDetPedestalService(){}
 
       void PreProcessEvent(const art::Event& evt, art::ScheduleContext) {
-        //fProvider.UpdateTimeStamp(evt.time().value());
-        fProvider.Update(evt.time().value());
+        fProvider.UpdateTimeStamp(evt.time().value());
+        //fProvider.Update(evt.time().value());
       }
 
     private:
