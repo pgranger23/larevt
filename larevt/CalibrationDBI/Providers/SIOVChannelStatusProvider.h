@@ -120,7 +120,7 @@ namespace lariov {
     ///@}
 
     /// Do actual database updates.
- 
+
     bool DBUpdate() const; // Uses current event time.
     bool DBUpdate(DBTimeStamp_t ts) const;
 
