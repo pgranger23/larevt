@@ -51,7 +51,6 @@ namespace lariov {
 
     //First grab an update from the database
     fProvider.UpdateTimeStamp(evt.time().value());
-    //fProvider.Update(evt.time().value());
   }
 
 } //end namespace lariov
