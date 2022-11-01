@@ -31,13 +31,9 @@ namespace lariov {
   };
 } //end namespace lariov
 
-<<<<<<< HEAD
-DECLARE_ART_SERVICE_INTERFACE_IMPL(lariov::SIOVChannelStatusService, lariov::ChannelStatusService, SHARED)
-=======
 DECLARE_ART_SERVICE_INTERFACE_IMPL(lariov::SIOVChannelStatusService,
                                    lariov::ChannelStatusService,
-                                   LEGACY)
->>>>>>> develop
+                                   SHARED)
 
 namespace lariov {
 

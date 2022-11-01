@@ -105,16 +105,12 @@ namespace lariov {
     bool result = false;
     if (fDataSource == DataSource::Database && ts != fCurrentTimeStamp) {
 
-<<<<<<< HEAD
       // A static mutex that is shared across all invocations of the function.
       static std::mutex mutex;
       std::lock_guard<std::mutex> lock(mutex);
 
-      mf::LogInfo("SIOVChannelStatusProvider") << "SIOVChannelStatusProvider::DBUpdate called with new timestamp.";
-=======
       mf::LogInfo("SIOVChannelStatusProvider")
         << "SIOVChannelStatusProvider::DBUpdate called with new timestamp.";
->>>>>>> develop
 
       fCurrentTimeStamp = ts;
 
