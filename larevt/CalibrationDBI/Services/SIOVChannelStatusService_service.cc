@@ -1,13 +1,13 @@
+#include "art/Framework/Principal/Event.h"
 #include "art/Framework/Services/Registry/ActivityRegistry.h"
 #include "art/Framework/Services/Registry/ServiceDefinitionMacros.h"
-#include "art/Framework/Principal/Event.h"
 #include "art/Persistency/Provenance/ScheduleContext.h"
 #include "fhiclcpp/ParameterSet.h"
 #include "larevt/CalibrationDBI/Interface/ChannelStatusService.h"
 #include "larevt/CalibrationDBI/Providers/SIOVChannelStatusProvider.h"
 #include "larcore/CoreUtils/EnsureOnlyOneSchedule.h"
 
-namespace lariov{
+namespace lariov {
 
   /**
      \class SIOVChannelStatusService
@@ -17,48 +17,47 @@ namespace lariov{
   */
   class SIOVChannelStatusService : public ChannelStatusService, private lar::EnsureOnlyOneSchedule<SIOVChannelStatusService> {
 
-    public:
+  public:
+    SIOVChannelStatusService(fhicl::ParameterSet const& pset, art::ActivityRegistry& reg);
 
-      SIOVChannelStatusService(fhicl::ParameterSet const& pset, art::ActivityRegistry& reg);
+    void PreProcessEvent(const art::Event& evt, art::ScheduleContext);
 
-      void PreProcessEvent(const art::Event& evt, art::ScheduleContext);
+  private:
+    const ChannelStatusProvider& DoGetProvider() const override { return fProvider; }
 
-    private:
+    const ChannelStatusProvider* DoGetProviderPtr() const override { return &fProvider; }
 
-      const ChannelStatusProvider& DoGetProvider() const override {
-        return fProvider;
-      }
-
-      const ChannelStatusProvider* DoGetProviderPtr() const override {
-        return &fProvider;
-      }
-
-      SIOVChannelStatusProvider fProvider;
+    SIOVChannelStatusProvider fProvider;
   };
-}//end namespace lariov
+} //end namespace lariov
 
+<<<<<<< HEAD
 DECLARE_ART_SERVICE_INTERFACE_IMPL(lariov::SIOVChannelStatusService, lariov::ChannelStatusService, SHARED)
+=======
+DECLARE_ART_SERVICE_INTERFACE_IMPL(lariov::SIOVChannelStatusService,
+                                   lariov::ChannelStatusService,
+                                   LEGACY)
+>>>>>>> develop
 
+namespace lariov {
 
-namespace lariov{
-
-  SIOVChannelStatusService::SIOVChannelStatusService(fhicl::ParameterSet const& pset, art::ActivityRegistry& reg)
-  : fProvider(pset.get<fhicl::ParameterSet>("ChannelStatusProvider"))
+  SIOVChannelStatusService::SIOVChannelStatusService(fhicl::ParameterSet const& pset,
+                                                     art::ActivityRegistry& reg)
+    : fProvider(pset.get<fhicl::ParameterSet>("ChannelStatusProvider"))
   {
 
     //register callback to update local database cache before each event is processed
     reg.sPreProcessEvent.watch(this, &SIOVChannelStatusService::PreProcessEvent);
-
   }
 
-
-  void SIOVChannelStatusService::PreProcessEvent(const art::Event& evt, art::ScheduleContext) {
+  void SIOVChannelStatusService::PreProcessEvent(const art::Event& evt, art::ScheduleContext)
+  {
 
     //First grab an update from the database
     fProvider.UpdateTimeStamp(evt.time().value());
     //fProvider.Update(evt.time().value());
   }
 
-}//end namespace lariov
+} //end namespace lariov
 
 DEFINE_ART_SERVICE_INTERFACE_IMPL(lariov::SIOVChannelStatusService, lariov::ChannelStatusService)
