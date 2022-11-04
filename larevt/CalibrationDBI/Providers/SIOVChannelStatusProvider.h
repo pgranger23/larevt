@@ -18,8 +18,6 @@
 #include "larevt/CalibrationDBI/Interface/ChannelStatusProvider.h"
 #include "larevt/CalibrationDBI/Providers/DatabaseRetrievalAlg.h"
 
-class SIOVChannelStatusService;
-
 // Utility libraries
 namespace fhicl {
   class ParameterSet;
@@ -37,8 +35,6 @@ namespace lariov {
    * SIOVChannelStatusService.
    */
   class SIOVChannelStatusProvider : public DatabaseRetrievalAlg, public ChannelStatusProvider {
-
-    friend class SIOVChannelStatusService;
 
   public:
     /// Constructor
@@ -102,10 +98,6 @@ namespace lariov {
     ChannelSet_t NoisyChannels() const override;
     /// @}
 
-    /// Converts LArSoft channel ID in the one proper for the DB
-    static DBChannelID_t rawToDBChannel(raw::ChannelID_t channel) { return DBChannelID_t(channel); }
-
-  private:
     /// Update event time stamp.
     void UpdateTimeStamp(DBTimeStamp_t ts);
 
@@ -119,6 +111,10 @@ namespace lariov {
 
     ///@}
 
+    /// Converts LArSoft channel ID in the one proper for the DB
+    static DBChannelID_t rawToDBChannel(raw::ChannelID_t channel) { return DBChannelID_t(channel); }
+
+  private:
     /// Do actual database updates.
 
     bool DBUpdate() const; // Uses current event time.

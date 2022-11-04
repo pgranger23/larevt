@@ -25,8 +25,6 @@
 #include "larevt/CalibrationDBI/Interface/DetPedestalProvider.h"
 #include "larevt/CalibrationDBI/Providers/DatabaseRetrievalAlg.h"
 
-class SIOVDetPedestalService;
-
 namespace fhicl {
   class ParameterSet;
 }
@@ -59,8 +57,6 @@ namespace lariov {
    */
   class DetPedestalRetrievalAlg : public DatabaseRetrievalAlg, public DetPedestalProvider {
 
-    friend class SIOVDetPedestalService;
-
   public:
     /// Constructors
     DetPedestalRetrievalAlg(const std::string& foldername,
@@ -71,6 +67,12 @@ namespace lariov {
 
     /// Reconfigure function called by fhicl constructor
     void Reconfigure(fhicl::ParameterSet const& p) override;
+
+    /// Update event time stamp.
+    void UpdateTimeStamp(DBTimeStamp_t ts);
+
+    /// Update Snapshot and inherited DBFolder if using database.  Return true if updated
+    bool Update(DBTimeStamp_t ts);
 
     /// Retrieve pedestal information
     const DetPedestal& Pedestal(DBChannelID_t ch) const;
@@ -93,12 +95,6 @@ namespace lariov {
                                                           "float"};
 
   private:
-    /// Update event time stamp.
-    void UpdateTimeStamp(DBTimeStamp_t ts);
-
-    /// Update Snapshot and inherited DBFolder if using database.  Return true if updated
-    bool Update(DBTimeStamp_t ts);
-
     /// Do actual database updates.
 
     bool DBUpdate() const; // Uses current event time.
