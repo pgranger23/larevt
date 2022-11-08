@@ -3,6 +3,7 @@
 #include "art/Framework/Services/Registry/ServiceDefinitionMacros.h"
 #include "art/Persistency/Provenance/ScheduleContext.h"
 #include "fhiclcpp/ParameterSet.h"
+#include "larcore/CoreUtils/EnsureOnlyOneSchedule.h"
 #include "larevt/CalibrationDBI/Interface/ChannelStatusService.h"
 #include "larevt/CalibrationDBI/Providers/SIOVChannelStatusProvider.h"
 
@@ -14,7 +15,8 @@ namespace lariov {
      a channel status retrieval service for database scheme in which
      all elements in a database folder share a common interval of validity
   */
-  class SIOVChannelStatusService : public ChannelStatusService {
+  class SIOVChannelStatusService : public ChannelStatusService,
+                                   private lar::EnsureOnlyOneSchedule<SIOVChannelStatusService> {
 
   public:
     SIOVChannelStatusService(fhicl::ParameterSet const& pset, art::ActivityRegistry& reg);
@@ -32,7 +34,7 @@ namespace lariov {
 
 DECLARE_ART_SERVICE_INTERFACE_IMPL(lariov::SIOVChannelStatusService,
                                    lariov::ChannelStatusService,
-                                   LEGACY)
+                                   SHARED)
 
 namespace lariov {
 

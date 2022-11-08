@@ -106,7 +106,7 @@ namespace lariov {
 
 } // namespace lariov
 
-DECLARE_ART_SERVICE_INTERFACE(lariov::ChannelStatusService, LEGACY)
+DECLARE_ART_SERVICE_INTERFACE(lariov::ChannelStatusService, SHARED)
 
 // check that the requirements for lariov::ChannelStatusService are satisfied
 template struct lar::details::ServiceRequirementsChecker<lariov::ChannelStatusService>;
