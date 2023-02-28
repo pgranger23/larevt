@@ -74,14 +74,8 @@ namespace lariov {
       {
         return *std::get<std::unique_ptr<std::string>>(fData[col]);
       }
-      long getLongData(size_t col) const
-      {
-        return std::get<long>(fData[col]);
-      }
-      double getDoubleData(size_t col) const
-      {
-        return std::get<double>(fData[col]);
-      }
+      long getLongData(size_t col) const { return std::get<long>(fData[col]); }
+      double getDoubleData(size_t col) const { return std::get<double>(fData[col]); }
 
     private:
       const value_type* fData; // Borrowed referenced from enclosing class.
@@ -121,21 +115,17 @@ namespace lariov {
 
     bool GetDataAsBool(DBChannelID_t channel, const std::string& name) const;
     long GetDataAsLong(DBChannelID_t channel, const std::string& name) const;
-    float GetDataAsFloat(DBChannelID_t channel, const std::string& name) const;  // Truncates from double to float
+    float GetDataAsFloat(DBChannelID_t channel,
+                         const std::string& name) const; // Truncates from double to float
     double GetDataAsDouble(DBChannelID_t channel, const std::string& name) const;
     std::string GetDataAsString(DBChannelID_t channel, const std::string& name) const;
 
     // Access one row.
 
-    DBRow
-    getRow(size_t row) const
-    {
-      return DBRow(&fData[ncols() * row]);
-    }
+    DBRow getRow(size_t row) const { return DBRow(&fData[ncols() * row]); }
 
     // SS: Can move the implementation to its CXX file.
-    DBRow
-    getRowForChannel(DBChannelID_t channel) const
+    DBRow getRowForChannel(DBChannelID_t channel) const
     {
       auto const row = getRowNumber(channel);
       if (row < 0) {
@@ -145,11 +135,7 @@ namespace lariov {
       return getRow(row);
     }
 
-    bool
-    IsValid(const IOVTimeStamp& time) const
-    {
-      return time >= fBeginTime && time < fEndTime;
-    }
+    bool IsValid(const IOVTimeStamp& time) const { return time >= fBeginTime && time < fEndTime; }
 
   private:
     IOVTimeStamp fBeginTime;              // IOV begin time.

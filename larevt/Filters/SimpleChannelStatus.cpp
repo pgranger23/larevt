@@ -13,54 +13,53 @@
 #include "larcoreobj/SimpleTypesAndConstants/RawTypes.h" // raw::isValidChannelID()
 
 // Framework libraries
-#include "fhiclcpp/ParameterSet.h"
 #include "cetlib/container_algorithms.h"
 #include "cetlib_except/exception.h"
-
+#include "fhiclcpp/ParameterSet.h"
 
 // C/C++ standard libraries
 #include <iterator> // std::inserter()
-#include <utility> // std::pair<>
+#include <utility>  // std::pair<>
 
-lariov::ChannelSet_t vectoset(fhicl::ParameterSet const& pset, std::string const name) {
-   auto vec = pset.get<std::vector<raw::ChannelID_t>>(name, {});
-   return {vec.begin(), vec.end()};
+lariov::ChannelSet_t vectoset(fhicl::ParameterSet const& pset, std::string const name)
+{
+  auto vec = pset.get<std::vector<raw::ChannelID_t>>(name, {});
+  return {vec.begin(), vec.end()};
 }
 
 namespace lariov {
-  
+
   //----------------------------------------------------------------------------
-  SimpleChannelStatus::SimpleChannelStatus(fhicl::ParameterSet const& pset, 
+  SimpleChannelStatus::SimpleChannelStatus(fhicl::ParameterSet const& pset,
                                            raw::ChannelID_t maxchannel,
                                            raw::ChannelID_t maxgoodchannel)
     : fMaxChannel(maxchannel)
     , fMaxPresentChannel(maxgoodchannel)
     , fBadChannels(vectoset(pset, "BadChannels"))
     , fNoisyChannels(vectoset(pset, "NoisyChannels"))
- {} // SimpleChannelStatus::SimpleChannelStatus()
-
+  {} // SimpleChannelStatus::SimpleChannelStatus()
 
   //----------------------------------------------------------------------------
-  bool SimpleChannelStatus::IsPresent(DBTimeStamp_t, raw::ChannelID_t channel) const {
+  bool SimpleChannelStatus::IsPresent(DBTimeStamp_t, raw::ChannelID_t channel) const
+  {
     bool allchannelspresent = raw::isValidChannelID(fMaxPresentChannel);
-    return allchannelspresent
-      ? raw::isValidChannelID(channel) && (channel <= fMaxPresentChannel)
-      : true;
+    return allchannelspresent ? raw::isValidChannelID(channel) && (channel <= fMaxPresentChannel) :
+                                true;
   } // SimpleChannelStatus::isPresent()
 
-
   //----------------------------------------------------------------------------
-  ChannelSet_t SimpleChannelStatus::GoodChannels(DBTimeStamp_t) const {
+  ChannelSet_t SimpleChannelStatus::GoodChannels(DBTimeStamp_t) const
+  {
 
     ChannelSet_t GoodChannels;
     // go for the first (lowest) channel ID...
     raw::ChannelID_t channel = 0;
-    while (!raw::isValidChannelID(channel)) ++channel;
+    while (!raw::isValidChannelID(channel))
+      ++channel;
 
     // ... to the last present one
     raw::ChannelID_t last_channel = fMaxChannel;
-    if (raw::isValidChannelID(fMaxPresentChannel)
-      && (fMaxPresentChannel < last_channel))
+    if (raw::isValidChannelID(fMaxPresentChannel) && (fMaxPresentChannel < last_channel))
       last_channel = fMaxPresentChannel;
 
     // if we don't know how many channels
@@ -75,30 +74,29 @@ namespace lariov {
       bool bGood = true;
 
       // check if this channel is in any of the vetoed lists
-      for (auto bad: fBadChannels) {
-          if (bad > channel) break;
-          if (bad == channel) { // vetoed!
-            bGood = false;
-            break;
-          }
+      for (auto bad : fBadChannels) {
+        if (bad > channel) break;
+        if (bad == channel) { // vetoed!
+          bGood = false;
+          break;
         }
-        if (bGood) {
-        for (auto noisy: fNoisyChannels) {
+      }
+      if (bGood) {
+        for (auto noisy : fNoisyChannels) {
           if (noisy > channel) break;
           if (noisy == channel) { // vetoed!
             bGood = false;
             break;
           }
-      }
+        }
       }
       // add the channel
       if (bGood) GoodChannels.insert(channel);
       ++channel;
     } // while
 
-  return GoodChannels;
+    return GoodChannels;
   } // SimpleChannelStatus::GoodChannels()
-
 
   //----------------------------------------------------------------------------
 

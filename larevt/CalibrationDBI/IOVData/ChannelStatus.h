@@ -37,39 +37,14 @@ namespace lariov {
       : ChData(ch), fStatus{GetStatusFromInt(status)}
     {}
 
-    bool
-    IsDead() const
-    {
-      return fStatus == kDEAD;
-    }
-    bool
-    IsLowNoise() const
-    {
-      return fStatus == kLOWNOISE;
-    }
-    bool
-    IsNoisy() const
-    {
-      return fStatus == kNOISY;
-    }
-    bool
-    IsPresent() const
-    {
-      return fStatus != kDISCONNECTED;
-    }
-    bool
-    IsGood() const
-    {
-      return fStatus == kGOOD;
-    }
-    chStatus
-    Status() const
-    {
-      return fStatus;
-    }
+    bool IsDead() const { return fStatus == kDEAD; }
+    bool IsLowNoise() const { return fStatus == kLOWNOISE; }
+    bool IsNoisy() const { return fStatus == kNOISY; }
+    bool IsPresent() const { return fStatus != kDISCONNECTED; }
+    bool IsGood() const { return fStatus == kGOOD; }
+    chStatus Status() const { return fStatus; }
 
-    static chStatus
-    GetStatusFromInt(int status)
+    static chStatus GetStatusFromInt(int status)
     {
       switch (status) {
       case kDISCONNECTED: return kDISCONNECTED;

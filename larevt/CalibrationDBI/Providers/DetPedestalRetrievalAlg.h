@@ -19,8 +19,8 @@
 
 // LArSoft libraries
 #include "larevt/CalibrationDBI/IOVData/DetPedestal.h"
-#include "larevt/CalibrationDBI/IOVData/Snapshot.h"
 #include "larevt/CalibrationDBI/IOVData/IOVDataConstants.h"
+#include "larevt/CalibrationDBI/IOVData/Snapshot.h"
 #include "larevt/CalibrationDBI/Interface/CalibrationDBIFwd.h"
 #include "larevt/CalibrationDBI/Interface/DetPedestalProvider.h"
 #include "larevt/CalibrationDBI/Providers/DBFolder.h"
@@ -56,45 +56,49 @@ namespace lariov {
    */
   class DetPedestalRetrievalAlg : public DetPedestalProvider {
 
-    public:
+  public:
+    /// Constructors
+    DetPedestalRetrievalAlg(const std::string& foldername,
+                            const std::string& url,
+                            const std::string& tag = "");
 
-      /// Constructors
-      DetPedestalRetrievalAlg(const std::string& foldername,
-                              const std::string& url,
-                              const std::string& tag="");
+    DetPedestalRetrievalAlg(fhicl::ParameterSet const& p);
 
-      DetPedestalRetrievalAlg(fhicl::ParameterSet const& p);
+    /// Retrieve pedestal information
+    float PedMean(DBTimeStamp_t ts, DBChannelID_t ch) const override;
+    float PedRms(DBTimeStamp_t ts, DBChannelID_t ch) const override;
+    float PedMeanErr(DBTimeStamp_t ts, DBChannelID_t ch) const override;
+    float PedRmsErr(DBTimeStamp_t ts, DBChannelID_t ch) const override;
 
-      /// Retrieve pedestal information
-      float PedMean(DBTimeStamp_t ts, DBChannelID_t ch) const override;
-      float PedRms(DBTimeStamp_t ts, DBChannelID_t ch) const override;
-      float PedMeanErr(DBTimeStamp_t ts, DBChannelID_t ch) const override;
-      float PedRmsErr(DBTimeStamp_t ts, DBChannelID_t ch) const override;
+    //hardcoded information about database folder - useful for debugging cross checks
+    static constexpr unsigned int NCOLUMNS = 5;
+    static constexpr const char* FIELD_NAMES[NCOLUMNS] = {"channel",
+                                                          "mean",
+                                                          "mean_err",
+                                                          "rms",
+                                                          "rms_err"};
+    static constexpr const char* FIELD_TYPES[NCOLUMNS] = {"unsigned int",
+                                                          "float",
+                                                          "float",
+                                                          "float",
+                                                          "float"};
 
-      //hardcoded information about database folder - useful for debugging cross checks
-      static constexpr unsigned int NCOLUMNS = 5;
-      static constexpr const char* FIELD_NAMES[NCOLUMNS]
-        = {"channel", "mean", "mean_err", "rms", "rms_err"};
-      static constexpr const char* FIELD_TYPES[NCOLUMNS]
-        = {"unsigned int", "float", "float", "float", "float"};
+    using cache_t = hep::concurrency::cache<DBTimeStamp_t, Snapshot<DetPedestal>>;
+    using handle_t = cache_t::handle;
 
-      using cache_t = hep::concurrency::cache<DBTimeStamp_t, Snapshot<DetPedestal>>;
-      using handle_t = cache_t::handle;
-    private:
+  private:
+    /// Do actual database updates.
+    handle_t DBUpdate(DBTimeStamp_t ts) const;
 
-      /// Do actual database updates.
-      handle_t DBUpdate(DBTimeStamp_t ts) const;
+    DBFolder fDBFolder;
 
-      DBFolder fDBFolder;
+    // Time stamps.
 
-      // Time stamps.
-
-
-      DataSource::ds fDataSource;
-      mutable cache_t fData;
-      const DetPedestal& Pedestal(DBTimeStamp_t ts, DBChannelID_t ch) const;
+    DataSource::ds fDataSource;
+    mutable cache_t fData;
+    const DetPedestal& Pedestal(DBTimeStamp_t ts, DBChannelID_t ch) const;
   };
-}//end namespace lariov
+} //end namespace lariov
 
 #endif
- /** @} */ // end of doxygen group
+/** @} */ // end of doxygen group

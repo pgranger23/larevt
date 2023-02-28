@@ -11,8 +11,8 @@
 
 #include "art/Framework/Principal/Run.h"
 #include "art/Framework/Services/Registry/ActivityRegistry.h"
-#include "art/Framework/Services/Registry/ServiceHandle.h"
 #include "art/Framework/Services/Registry/ServiceDeclarationMacros.h"
+#include "art/Framework/Services/Registry/ServiceHandle.h"
 #include "fhiclcpp/ParameterSet.h"
 #include "larevt/SpaceCharge/SpaceChargeStandard.h"
 #include "larevt/SpaceChargeServices/SpaceChargeService.h"
@@ -30,11 +30,7 @@ namespace spacecharge {
     void reconfigure(fhicl::ParameterSet const& pset);
     void preBeginRun(const art::Run& run);
 
-    const provider_type*
-    provider() const override
-    {
-      return &fProp;
-    }
+    const provider_type* provider() const override { return &fProp; }
 
     spacecharge::SpaceChargeStandard fProp;
 

@@ -32,43 +32,24 @@ namespace lariov {
 
   public:
     Snapshot() = default;
-    Snapshot(IOVTimeStamp const start, IOVTimeStamp const end)
-      : fStart{start}, fEnd{end}
-    {}
+    Snapshot(IOVTimeStamp const start, IOVTimeStamp const end) : fStart{start}, fEnd{end} {}
 
     void Clear();
 
-    const IOVTimeStamp&
-    Start() const
-    {
-      return fStart;
-    }
-    const IOVTimeStamp&
-    End() const
-    {
-      return fEnd;
-    }
+    const IOVTimeStamp& Start() const { return fStart; }
+    const IOVTimeStamp& End() const { return fEnd; }
     void SetIoV(const IOVTimeStamp& start, const IOVTimeStamp& end);
 
     bool IsValid(const IOVTimeStamp& ts) const;
 
-    size_t
-    NChannels() const
-    {
-      return fData.size();
-    }
+    size_t NChannels() const { return fData.size(); }
 
-    const std::vector<T>&
-    Data() const
-    {
-      return fData;
-    }
+    const std::vector<T>& Data() const { return fData; }
 
     /// Only included with class if T has base class ChData
     template <class U = T,
               typename std::enable_if<std::is_base_of<ChData, U>::value, int>::type = 0>
-    bool
-    HasChannel(unsigned int ch) const
+    bool HasChannel(unsigned int ch) const
     {
 
       typename std::vector<T>::const_iterator it = std::lower_bound(fData.begin(), fData.end(), ch);
@@ -79,8 +60,7 @@ namespace lariov {
 
     template <class U = T,
               typename std::enable_if<std::is_base_of<ChData, U>::value, int>::type = 0>
-    const T&
-    GetRow(unsigned int ch) const
+    const T& GetRow(unsigned int ch) const
     {
       auto it = std::lower_bound(fData.begin(), fData.end(), ch);
 
@@ -95,8 +75,7 @@ namespace lariov {
 
     template <class U = T,
               typename std::enable_if<std::is_base_of<ChData, U>::value, int>::type = 0>
-    void
-    AddOrReplaceRow(const T& data)
+    void AddOrReplaceRow(const T& data)
     {
       auto it = std::lower_bound(fData.begin(), fData.end(), data.Channel());
       if (it == fData.end() || data.Channel() != it->Channel()) {
@@ -119,8 +98,7 @@ namespace lariov {
   // Class implementation
   //=============================================
   template <class T>
-  void
-  Snapshot<T>::Clear()
+  void Snapshot<T>::Clear()
   {
     fData.clear();
     fStart = fEnd = IOVTimeStamp::MaxTimeStamp();
@@ -128,8 +106,7 @@ namespace lariov {
   }
 
   template <class T>
-  void
-  Snapshot<T>::SetIoV(const IOVTimeStamp& start, const IOVTimeStamp& end)
+  void Snapshot<T>::SetIoV(const IOVTimeStamp& start, const IOVTimeStamp& end)
   {
     if (start >= end) {
       throw IOVDataError("Called Snapshot::SetIoV with start timestamp >= end timestamp!");
@@ -140,8 +117,7 @@ namespace lariov {
   }
 
   template <class T>
-  bool
-  Snapshot<T>::IsValid(const IOVTimeStamp& ts) const
+  bool Snapshot<T>::IsValid(const IOVTimeStamp& ts) const
   {
     return ts >= fStart && ts < fEnd;
   }

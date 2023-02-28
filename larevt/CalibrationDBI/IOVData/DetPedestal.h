@@ -30,26 +30,10 @@ namespace lariov {
       : ChData(ch), fPedMean{mean}, fPedRms{rms}, fPedMeanErr{mean_err}, fPedRmsErr{rms_err}
     {}
 
-    float
-    PedMean() const noexcept
-    {
-      return fPedMean;
-    }
-    float
-    PedRms() const noexcept
-    {
-      return fPedRms;
-    }
-    float
-    PedMeanErr() const noexcept
-    {
-      return fPedMeanErr;
-    }
-    float
-    PedRmsErr() const noexcept
-    {
-      return fPedRmsErr;
-    }
+    float PedMean() const noexcept { return fPedMean; }
+    float PedRms() const noexcept { return fPedRms; }
+    float PedMeanErr() const noexcept { return fPedMeanErr; }
+    float PedRmsErr() const noexcept { return fPedRmsErr; }
 
   private:
     float fPedMean;

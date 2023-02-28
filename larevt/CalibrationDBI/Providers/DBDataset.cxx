@@ -157,8 +157,7 @@ lariov::DBDataset::DBDataset(const IOVTimeStamp& begin_time,        // IOV begin
   , fData(std::move(data))
 {}
 
-bool
-lariov::DBDataset::GetDataAsBool(DBChannelID_t channel, const std::string& name) const
+bool lariov::DBDataset::GetDataAsBool(DBChannelID_t channel, const std::string& name) const
 {
   auto const row = getRowForChannel(channel);
   size_t col = getColNumber(name);
@@ -166,16 +165,14 @@ lariov::DBDataset::GetDataAsBool(DBChannelID_t channel, const std::string& name)
   return value != 0;
 }
 
-long
-lariov::DBDataset::GetDataAsLong(DBChannelID_t channel, const std::string& name) const
+long lariov::DBDataset::GetDataAsLong(DBChannelID_t channel, const std::string& name) const
 {
   auto const row = getRowForChannel(channel);
   size_t col = getColNumber(name);
   return row.getLongData(col);
 }
 
-float
-lariov::DBDataset::GetDataAsFloat(DBChannelID_t channel, const std::string& name) const
+float lariov::DBDataset::GetDataAsFloat(DBChannelID_t channel, const std::string& name) const
 {
   // Floating-point data is stored as a double, so we cast the double
   // result to a float.
@@ -183,16 +180,14 @@ lariov::DBDataset::GetDataAsFloat(DBChannelID_t channel, const std::string& name
   return static_cast<float>(value);
 }
 
-double
-lariov::DBDataset::GetDataAsDouble(DBChannelID_t channel, const std::string& name) const
+double lariov::DBDataset::GetDataAsDouble(DBChannelID_t channel, const std::string& name) const
 {
   auto const row = getRowForChannel(channel);
   size_t col = getColNumber(name);
   return row.getDoubleData(col);
 }
 
-std::string
-lariov::DBDataset::GetDataAsString(DBChannelID_t channel, const std::string& name) const
+std::string lariov::DBDataset::GetDataAsString(DBChannelID_t channel, const std::string& name) const
 {
   auto const row = getRowForChannel(channel);
   size_t col = getColNumber(name);
@@ -201,8 +196,7 @@ lariov::DBDataset::GetDataAsString(DBChannelID_t channel, const std::string& nam
 
 // Get column number by column name.
 // Return -1 if not found.
-size_t
-lariov::DBDataset::getColNumber(const std::string& name) const
+size_t lariov::DBDataset::getColNumber(const std::string& name) const
 {
   int col = -1;
 
@@ -228,8 +222,7 @@ lariov::DBDataset::getColNumber(const std::string& name) const
 // Get row number by channel number.
 // Return -1 if not found.
 
-int
-lariov::DBDataset::getRowNumber(DBChannelID_t ch) const
+int lariov::DBDataset::getRowNumber(DBChannelID_t ch) const
 {
   int result = -1;
 

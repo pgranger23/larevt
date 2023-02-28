@@ -35,31 +35,11 @@ namespace lariov {
       , fShapingTimeErr{shaping_time_err}
     {}
 
-    float
-    Gain() const noexcept
-    {
-      return fGain;
-    }
-    float
-    GainErr() const noexcept
-    {
-      return fGainErr;
-    }
-    float
-    ShapingTime() const noexcept
-    {
-      return fShapingTime;
-    }
-    float
-    ShapingTimeErr() const noexcept
-    {
-      return fShapingTimeErr;
-    }
-    CalibrationExtraInfo const&
-    ExtraInfo() const noexcept
-    {
-      return fExtraInfo;
-    }
+    float Gain() const noexcept { return fGain; }
+    float GainErr() const noexcept { return fGainErr; }
+    float ShapingTime() const noexcept { return fShapingTime; }
+    float ShapingTimeErr() const noexcept { return fShapingTimeErr; }
+    CalibrationExtraInfo const& ExtraInfo() const noexcept { return fExtraInfo; }
 
   private:
     float fGain;

@@ -1,12 +1,12 @@
+#include "art/Framework/Principal/Event.h"
 #include "art/Framework/Services/Registry/ActivityRegistry.h"
 #include "art/Framework/Services/Registry/ServiceDefinitionMacros.h"
-#include "art/Framework/Principal/Event.h"
 #include "art/Persistency/Provenance/ScheduleContext.h"
 #include "fhiclcpp/ParameterSet.h"
 #include "larevt/CalibrationDBI/Interface/DetPedestalService.h"
 #include "larevt/CalibrationDBI/Providers/DetPedestalRetrievalAlg.h"
 
-namespace lariov{
+namespace lariov {
 
   /**
      \class SIOVDetPedestalService
@@ -16,30 +16,26 @@ namespace lariov{
   */
   class SIOVDetPedestalService : public DetPedestalService {
 
-    public:
+  public:
+    SIOVDetPedestalService(fhicl::ParameterSet const& pset);
 
-      SIOVDetPedestalService(fhicl::ParameterSet const& pset);
+  private:
+    const DetPedestalProvider& DoGetPedestalProvider() const override { return fProvider; }
 
-    private:
-
-      const DetPedestalProvider& DoGetPedestalProvider() const override {
-        return fProvider;
-      }
-
-      DetPedestalRetrievalAlg fProvider;
+    DetPedestalRetrievalAlg fProvider;
   };
-}//end namespace lariov
+} //end namespace lariov
 
-DECLARE_ART_SERVICE_INTERFACE_IMPL(lariov::SIOVDetPedestalService, lariov::DetPedestalService, SHARED)
+DECLARE_ART_SERVICE_INTERFACE_IMPL(lariov::SIOVDetPedestalService,
+                                   lariov::DetPedestalService,
+                                   SHARED)
 
-
-namespace lariov{
+namespace lariov {
 
   SIOVDetPedestalService::SIOVDetPedestalService(fhicl::ParameterSet const& pset)
-  : fProvider(pset.get<fhicl::ParameterSet>("DetPedestalRetrievalAlg"))
-  {
-  }
+    : fProvider(pset.get<fhicl::ParameterSet>("DetPedestalRetrievalAlg"))
+  {}
 
-}//end namespace lariov
+} //end namespace lariov
 
 DEFINE_ART_SERVICE_INTERFACE_IMPL(lariov::SIOVDetPedestalService, lariov::DetPedestalService)

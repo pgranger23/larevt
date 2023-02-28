@@ -8,14 +8,13 @@
  * Service serving a SimpleChannelStatus.
  */
 
-
 #ifndef SIMPLECHANNELFILTERSERVICE_H
 #define SIMPLECHANNELFILTERSERVICE_H
 
 // LArSoft libraries
-#include "larevt/Filters/SimpleChannelStatus.h"
-#include "larevt/CalibrationDBI/Interface/ChannelStatusService.h"
 #include "art/Framework/Services/Registry/ServiceDeclarationMacros.h"
+#include "larevt/CalibrationDBI/Interface/ChannelStatusService.h"
+#include "larevt/Filters/SimpleChannelStatus.h"
 
 // C/C++ standard libraries
 #include <memory> //std::unique_ptr<>
@@ -23,7 +22,6 @@
 namespace art {
   class Run;
 } // namespace art
-
 
 namespace lariov {
 
@@ -46,28 +44,23 @@ namespace lariov {
    * - *service_type* (string): must be set to "SimpleChannelStatusService"
    *
    */
-  class SimpleChannelStatusService: public ChannelStatusService {
-      public:
-
+  class SimpleChannelStatusService : public ChannelStatusService {
+  public:
     /// Constructor: reads the channel IDs from the configuration
     SimpleChannelStatusService(fhicl::ParameterSet const& pset);
 
-
-      private:
-
-    virtual ChannelStatusProvider const& DoGetProvider() const override
-     { return fProvider; }
-    virtual ChannelStatusProvider const* DoGetProviderPtr() const override
-     { return &fProvider; }
+  private:
+    virtual ChannelStatusProvider const& DoGetProvider() const override { return fProvider; }
+    virtual ChannelStatusProvider const* DoGetProviderPtr() const override { return &fProvider; }
     raw::ChannelID_t fMaxChannel;
     SimpleChannelStatus fProvider;
- 
-  }; // class SimpleChannelStatusService
 
+  }; // class SimpleChannelStatusService
 
 } // namespace lariov
 
-DECLARE_ART_SERVICE_INTERFACE_IMPL
-  (lariov::SimpleChannelStatusService, lariov::ChannelStatusService, SHARED)
+DECLARE_ART_SERVICE_INTERFACE_IMPL(lariov::SimpleChannelStatusService,
+                                   lariov::ChannelStatusService,
+                                   SHARED)
 
 #endif // SIMPLECHANNELFILTERSERVICE_H

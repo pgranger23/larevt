@@ -20,22 +20,21 @@
 namespace lariov {
 
   //----------------------------------------------------------------------------
-  SimpleChannelStatusService::SimpleChannelStatusService(fhicl::ParameterSet const& pset) :
-  fMaxChannel{art::ServiceHandle<geo::Geometry const>()->Nchannels() - 1},
-  fProvider{pset, fMaxChannel, fMaxChannel}
+  SimpleChannelStatusService::SimpleChannelStatusService(fhicl::ParameterSet const& pset)
+    : fMaxChannel{art::ServiceHandle<geo::Geometry const>()->Nchannels() - 1}
+    , fProvider{pset, fMaxChannel, fMaxChannel}
   {
-    mf::LogInfo("SimpleChannelStatusService") << "Loaded from configuration:"
+    mf::LogInfo("SimpleChannelStatusService")
+      << "Loaded from configuration:"
       << "\n  - " << fProvider.BadChannels(-1u).size() << " bad channels"
       << "\n  - " << fProvider.NoisyChannels(-1u).size() << " noisy channels"
       << "\n  - largest channel ID: " << fProvider.MaxChannel()
-        << ", largest present: " << fProvider.MaxChannelPresent()
-      ;
+      << ", largest present: " << fProvider.MaxChannelPresent();
 
   } // SimpleChannelStatusService::SimpleChannelStatusService()
 
-
   //----------------------------------------------------------------------------
-  DEFINE_ART_SERVICE_INTERFACE_IMPL
-    (lariov::SimpleChannelStatusService, lariov::ChannelStatusService)
+  DEFINE_ART_SERVICE_INTERFACE_IMPL(lariov::SimpleChannelStatusService,
+                                    lariov::ChannelStatusService)
 
 } // namespace filter

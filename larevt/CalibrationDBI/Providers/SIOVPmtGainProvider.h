@@ -11,11 +11,11 @@
 #ifndef SIOVPMTGAINPROVIDER_H
 #define SIOVPMTGAINPROVIDER_H
 
+#include "DBFolder.h"
+#include "larevt/CalibrationDBI/IOVData/IOVDataConstants.h"
 #include "larevt/CalibrationDBI/IOVData/PmtGain.h"
 #include "larevt/CalibrationDBI/IOVData/Snapshot.h"
-#include "larevt/CalibrationDBI/IOVData/IOVDataConstants.h"
 #include "larevt/CalibrationDBI/Interface/PmtGainProvider.h"
-#include "DBFolder.h"
 
 namespace lariov {
 
@@ -37,37 +37,35 @@ namespace lariov {
    */
   class SIOVPmtGainProvider : public PmtGainProvider {
 
-    public:
+  public:
+    /// Constructors
+    SIOVPmtGainProvider(fhicl::ParameterSet const& p);
 
-      /// Constructors
-      SIOVPmtGainProvider(fhicl::ParameterSet const& p);
+    /// Update event time stamp.
+    void UpdateTimeStamp(DBTimeStamp_t ts);
 
-      /// Update event time stamp.
-      void UpdateTimeStamp(DBTimeStamp_t ts);
+    /// Retrieve gain information
+    const PmtGain& PmtGainObject(DBChannelID_t ch) const;
+    float Gain(DBChannelID_t ch) const override;
+    float GainErr(DBChannelID_t ch) const override;
+    CalibrationExtraInfo const& ExtraInfo(DBChannelID_t ch) const override;
 
-      /// Retrieve gain information
-      const PmtGain& PmtGainObject(DBChannelID_t ch) const;
-      float Gain(DBChannelID_t ch) const override;
-      float GainErr(DBChannelID_t ch) const override;
-      CalibrationExtraInfo const& ExtraInfo(DBChannelID_t ch) const override;
+  private:
+    /// Do actual database updates.
 
-    private:
+    Snapshot<PmtGain> const& DBUpdate(DBTimeStamp_t ts) const;
 
-      /// Do actual database updates.
+    DBFolder fDBFolder;
 
-      Snapshot<PmtGain> const& DBUpdate(DBTimeStamp_t ts) const;
+    // Time stamps.
 
-      DBFolder fDBFolder;
+    DBTimeStamp_t fEventTimeStamp;           // Most recently seen time stamp.
+    mutable DBTimeStamp_t fCurrentTimeStamp; // Time stamp of cached data.
 
-      // Time stamps.
+    DataSource::ds fDataSource;
 
-      DBTimeStamp_t fEventTimeStamp;            // Most recently seen time stamp.
-      mutable DBTimeStamp_t fCurrentTimeStamp;  // Time stamp of cached data.
-
-      DataSource::ds fDataSource;
-
-      mutable Snapshot<PmtGain> fData;
+    mutable Snapshot<PmtGain> fData;
   };
-}//end namespace lariov
+} //end namespace lariov
 
 #endif

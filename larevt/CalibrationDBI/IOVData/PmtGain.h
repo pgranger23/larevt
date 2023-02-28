@@ -23,27 +23,13 @@ namespace lariov {
   */
   class PmtGain : public ChData {
   public:
-    PmtGain(unsigned int const ch,
-            float const gain,
-            float const gain_err)
+    PmtGain(unsigned int const ch, float const gain, float const gain_err)
       : ChData(ch), fGain{gain}, fGainErr{gain_err}
     {}
 
-    float
-    Gain() const noexcept
-    {
-      return fGain;
-    }
-    float
-    GainErr() const noexcept
-    {
-      return fGainErr;
-    }
-    CalibrationExtraInfo const&
-    ExtraInfo() const noexcept
-    {
-      return fExtraInfo;
-    }
+    float Gain() const noexcept { return fGain; }
+    float GainErr() const noexcept { return fGainErr; }
+    CalibrationExtraInfo const& ExtraInfo() const noexcept { return fExtraInfo; }
 
   private:
     float fGain;

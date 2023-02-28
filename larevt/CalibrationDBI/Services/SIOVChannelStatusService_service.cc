@@ -1,11 +1,11 @@
-#include "art/Framework/Services/Registry/ServiceDefinitionMacros.h"
 #include "art/Framework/Principal/Event.h"
+#include "art/Framework/Services/Registry/ServiceDefinitionMacros.h"
 #include "art/Persistency/Provenance/ScheduleContext.h"
 #include "fhiclcpp/ParameterSet.h"
 #include "larevt/CalibrationDBI/Interface/ChannelStatusService.h"
 #include "larevt/CalibrationDBI/Providers/SIOVChannelStatusProvider.h"
 
-namespace lariov{
+namespace lariov {
 
   /**
      \class SIOVChannelStatusService
@@ -15,33 +15,28 @@ namespace lariov{
   */
   class SIOVChannelStatusService : public ChannelStatusService {
 
-    public:
+  public:
+    SIOVChannelStatusService(fhicl::ParameterSet const& pset);
 
-      SIOVChannelStatusService(fhicl::ParameterSet const& pset);
+  private:
+    const ChannelStatusProvider& DoGetProvider() const override { return fProvider; }
 
-    private:
+    const ChannelStatusProvider* DoGetProviderPtr() const override { return &fProvider; }
 
-      const ChannelStatusProvider& DoGetProvider() const override {
-        return fProvider;
-      }
-
-      const ChannelStatusProvider* DoGetProviderPtr() const override {
-        return &fProvider;
-      }
-
-      SIOVChannelStatusProvider fProvider;
+    SIOVChannelStatusProvider fProvider;
   };
-}//end namespace lariov
+} //end namespace lariov
 
-DECLARE_ART_SERVICE_INTERFACE_IMPL(lariov::SIOVChannelStatusService, lariov::ChannelStatusService, LEGACY)
+DECLARE_ART_SERVICE_INTERFACE_IMPL(lariov::SIOVChannelStatusService,
+                                   lariov::ChannelStatusService,
+                                   LEGACY)
 
-
-namespace lariov{
+namespace lariov {
 
   SIOVChannelStatusService::SIOVChannelStatusService(fhicl::ParameterSet const& pset)
-  : fProvider(pset.get<fhicl::ParameterSet>("ChannelStatusProvider"))
+    : fProvider(pset.get<fhicl::ParameterSet>("ChannelStatusProvider"))
   {}
 
-}//end namespace lariov
+} //end namespace lariov
 
 DEFINE_ART_SERVICE_INTERFACE_IMPL(lariov::SIOVChannelStatusService, lariov::ChannelStatusService)
