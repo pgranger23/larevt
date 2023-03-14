@@ -17,6 +17,15 @@
 #include "larevt/SpaceCharge/SpaceChargeStandard.h"
 #include "larevt/SpaceChargeServices/SpaceChargeService.h"
 
+namespace art {
+  class ActivityRegistry;
+  class Run;
+}
+
+namespace fhicl {
+  class ParameterSet;
+}
+
 namespace spacecharge {
   class SpaceChargeServiceStandard : public SpaceChargeService {
   public:

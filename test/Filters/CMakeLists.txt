@@ -1,13 +1,11 @@
 cet_enable_asserts()
 
-simple_plugin ( SimpleChannelStatusTest "module"
-                    larevt_Filters
-                    messagefacility::MF_MessageLogger
-                    
-                    fhiclcpp::fhiclcpp
-                    cetlib::cetlib cetlib_except
-                    ${ROOT_BASIC_LIB_LIST}
-              )
+cet_build_plugin(SimpleChannelStatusTest art::EDAnalyzer NO_INSTALL
+  LIBRARIES PRIVATE
+  larevt::ChannelStatusProvider
+  larevt::ChannelStatusService
+  larevt::Filters
+)
 
 cet_test(ChannelStatusServiceTest HANDBUILT
   DATAFILES test_channel_status.fcl
@@ -15,14 +13,11 @@ cet_test(ChannelStatusServiceTest HANDBUILT
   TEST_ARGS --rethrow-all --config ./test_channel_status.fcl
 )
 
-cet_test(SimpleChannelStatus_test
-  SOURCES SimpleChannelStatus_test.cxx
-  LIBRARIES larevt_Filters
-            larevt_CalibrationDBI_IOVData
-            fhiclcpp::fhiclcpp
-  USE_BOOST_UNIT
+cet_test(SimpleChannelStatus_test USE_BOOST_UNIT
+  SOURCE SimpleChannelStatus_test.cxx
+  LIBRARIES PRIVATE
+  larevt::Filters
+  larevt::CalibrationDBI_IOVData
+  fhiclcpp::fhiclcpp
 )
 
-# install_headers()
-# install_fhicl()
-# install_source()

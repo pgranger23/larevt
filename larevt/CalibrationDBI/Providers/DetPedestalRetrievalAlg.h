@@ -24,7 +24,6 @@
 #include "larevt/CalibrationDBI/Interface/CalibrationDBIFwd.h"
 #include "larevt/CalibrationDBI/Interface/DetPedestalProvider.h"
 #include "larevt/CalibrationDBI/Providers/DBFolder.h"
-
 #include "fhiclcpp/fwd.h"
 #include "hep_concurrency/cache.h"
 

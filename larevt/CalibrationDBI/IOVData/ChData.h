@@ -24,11 +24,8 @@ namespace lariov {
   public:
     explicit ChData(unsigned int ch) : fChannel(ch) {}
     unsigned int Channel() const { return fChannel; }
-
     bool operator<(unsigned int rhs) const { return fChannel < rhs; }
-
     bool operator<(const ChData& ch) const { return fChannel < ch.Channel(); }
-
   private:
     unsigned int fChannel;
   };

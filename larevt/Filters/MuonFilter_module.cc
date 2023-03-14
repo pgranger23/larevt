@@ -85,10 +85,11 @@ namespace filter {
 
     // This code only works comparing 2 planes so for now these are the
     // last induction plane and collection plane
-    int vPlane = geom->Nplanes() - 1;
-    geo::View_t vView = geom->Plane(vPlane).View();
-    int uPlane = vPlane - 1;
-    geo::View_t uView = geom->Plane(uPlane).View();
+    geo::TPCID const tpcid{0, 0};
+    unsigned int vPlane = geom->Nplanes(tpcid) - 1;
+    geo::View_t vView = geom->Plane({tpcid, vPlane}).View();
+    unsigned int uPlane = vPlane - 1;
+    geo::View_t uView = geom->Plane({tpcid, uPlane}).View();
     art::Handle<std::vector<recob::Cluster>> clustHandle;
     evt.getByLabel(fClusterModuleLabel, clustHandle);
 

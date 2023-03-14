@@ -1,6 +1,6 @@
 /**
  * @file   SimpleChannelStatusService_service.cc
- * @brief  Service for channel quality info
+ * @brief  Service Registration for channel quality info
  * @author Gianluca Petrillo (petrillo@fnal.gov)
  * @date   November 24th, 2014
  * @see    SimpleChannelStatusService.h
@@ -9,13 +9,8 @@
 // Our header
 #include "larevt/Filters/SimpleChannelStatusService.h"
 
-// LArSoft libraries
-#include "larcore/Geometry/Geometry.h"
-
 // Framework libraries
 #include "art/Framework/Services/Registry/ServiceDefinitionMacros.h"
-#include "art/Framework/Services/Registry/ServiceHandle.h"
-#include "messagefacility/MessageLogger/MessageLogger.h"
 
 namespace lariov {
 

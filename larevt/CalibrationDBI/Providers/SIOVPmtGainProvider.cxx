@@ -1,6 +1,7 @@
 #include "SIOVPmtGainProvider.h"
 
 // art/LArSoft libraries
+#include "art/Framework/Services/Registry/ServiceHandle.h"
 #include "cetlib_except/exception.h"
 #include "larcore/Geometry/Geometry.h"
 #include "messagefacility/MessageLogger/MessageLogger.h"

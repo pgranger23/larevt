@@ -1,22 +1,34 @@
-cet_find_library(LIBWDA NAMES wda PATHS ENV LIBWDA_LIB NO_DEFAULT_PATH)
-cet_find_library(SQLITE NAMES sqlite3_ups PATHS ENV SQLITE_LIB NO_DEFAULT_PATH)
-
-include_directories($ENV{LIBWDA_FQ_DIR}/include)
-
-art_make(LIB_LIBRARIES
-           larevt_CalibrationDBI_IOVData
-           LIBWDA
-           SQLITE
-           messagefacility::MF_MessageLogger
-           fhiclcpp::fhiclcpp
-           canvas::canvas
-           cetlib::cetlib
-           cetlib_except::cetlib_except
-           larcorealg_Geometry
-           art::Framework_Services_Registry
-           ROOT::Core
-           art::Utilities
-        )
+cet_make_library(
+  SOURCE
+  DBDataset.cxx
+  DBFolder.cxx
+  DatabaseRetrievalAlg.cxx
+  DetPedestalRetrievalAlg.cxx
+  SIOVChannelStatusProvider.cxx
+  SIOVElectronicsCalibProvider.cxx
+  SIOVPmtGainProvider.cxx
+  LIBRARIES
+  PUBLIC
+  larevt::CalibrationDBI_IOVData
+  larevt::ChannelStatusProvider
+  larevt::DetPedestalProvider
+  larevt::ElectronLifetimeProvider
+  larevt::ElectronicsCalibProvider
+  larevt::PmtGainProvider
+  PRIVATE
+  messagefacility::MF_MessageLogger
+  fhiclcpp::fhiclcpp
+  canvas::canvas
+  cetlib::cetlib
+  cetlib_except::cetlib_except
+  larcorealg::Geometry
+  larcore::Geometry_Geometry_service
+  art::Framework_Services_Registry
+  ROOT::Core
+  wda::wda
+  SQLite::SQLite3
+  art::Utilities
+)
 
 install_headers()
 install_source()

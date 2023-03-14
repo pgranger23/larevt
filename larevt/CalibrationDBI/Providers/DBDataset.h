@@ -48,7 +48,6 @@
 //
 //=================================================================================
 
-#include "WebError.h"
 #include "larevt/CalibrationDBI/IOVData/IOVTimeStamp.h"
 #include "larevt/CalibrationDBI/Interface/CalibrationDBIFwd.h"
 #include <memory>
@@ -144,8 +143,7 @@ namespace lariov {
     std::vector<std::string> fColTypes;   // Column types.
     std::vector<DBChannelID_t> fChannels; // Channels.
     std::vector<value_type> fData;        // Calibration data (length nchan*ncols).
-
-    // from 12/18/20: we start here next year.
+    // SS: from 12/18/20: we start here next year.
     // and fix binary search in DBDataSet.cxx
     int getRowNumber(DBChannelID_t ch) const;
     size_t getColNumber(const std::string& name) const;

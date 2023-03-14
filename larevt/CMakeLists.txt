@@ -1,5 +1,7 @@
+cet_make_library(HEADERS_TARGET_ONLY)
+
 add_subdirectory(SpaceCharge)
 add_subdirectory(SpaceChargeServices)
-add_subdirectory(Filters)
 add_subdirectory(CalibrationDBI)
+add_subdirectory(Filters)
 add_subdirectory(CalData)

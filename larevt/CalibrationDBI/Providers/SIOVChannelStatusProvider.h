@@ -42,9 +42,6 @@ namespace lariov {
   public:
     /// Constructor
     SIOVChannelStatusProvider(fhicl::ParameterSet const& pset);
-
-    virtual ~SIOVChannelStatusProvider() = default;
-
     //
     // interface methods
     //

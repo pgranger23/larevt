@@ -103,12 +103,6 @@ namespace lariov {
     /// Returns a copy of set of noisy channel IDs for the current run
     virtual ChannelSet_t NoisyChannels(DBTimeStamp_t ts) const = 0;
 
-    /* TODO DELME
-      /// Prepares the object to provide information about the specified time
-      /// @return whether information is available for the specified time
-      virtual bool Update(DBTimeStamp_t ts) = 0;
-      */
-
     /// Returns whether the specified status is a valid one
     static bool IsValidStatus(Status_t status) { return status != InvalidStatus; }
 

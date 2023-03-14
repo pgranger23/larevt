@@ -41,7 +41,6 @@ namespace lariov {
       fSubStamp = substamp;
       this->CalcDBStamp();
     }
-
     /**
         This function combines the stamp and substamp into a unique string to be used
         as a database timestamp.

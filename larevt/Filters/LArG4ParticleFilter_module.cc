@@ -215,8 +215,7 @@ namespace filt {
     final_position[1] = final_position_4vect.Y();
     final_position[2] = final_position_4vect.Z();
 
-    geo::TPCID tpcid = fGeom->FindTPCAtPosition(final_position);
-    bool validtpc = tpcid.isValid;
+    geo::TPCID tpcid = fGeom->FindTPCAtPosition(geo::vect::toPoint(final_position));
     //Now we need to compare if we have a TPC that we stopped in with whether we wanted to stop in a TPC at all
     if (validtpc) {
       //The particle DID stop in a TPC.  Now, did we WANT this to happen
@@ -255,11 +254,8 @@ namespace filt {
     //Loop through the trajectory points
     for (unsigned int i = 0; i < particle->NumberTrajectoryPoints(); i++) {
       //Extract the current position of the particle
-      double curr_pos[3];
-      curr_pos[0] = particle->Position(i).X();
-      curr_pos[1] = particle->Position(i).Y();
-      curr_pos[2] = particle->Position(i).Z();
-      geo::TPCID curr_tpcid = fGeom->FindTPCAtPosition(curr_pos);
+      geo::TPCID curr_tpcid =
+        fGeom->FindTPCAtPosition(geo::vect::toPoint(particle->Position(i).Vect()));
       //There are a couple of things to check here.  If the particle is currently in the TPC, then we need to store that particular position.  If it is NOT in the TPC, then its either exited the TPC or has not yet entered.  If it has just exited, then the position_segment should have some positions stored in it, it which case we now need to store this segment.  If it has not yet entered the TPC, then we don't need to do anything
       //If it is currently in the TPC
       if (curr_tpcid.isValid) position_segment.push_back(particle->Position(i).Vect());

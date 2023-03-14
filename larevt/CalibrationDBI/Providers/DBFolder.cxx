@@ -5,7 +5,6 @@
 
 #include "cetlib/search_path.h"
 #include "cetlib_except/exception.h"
-#include "fhiclcpp/ParameterSet.h"
 #include "messagefacility/MessageLogger/MessageLogger.h"
 #include "sqlite3.h"
 #include "wda.h"
@@ -31,7 +30,6 @@ namespace lariov {
     fUseSQLite = usesqlite;
     fTestMode = testmode;
     if (fURL[fURL.length() - 1] == '/') { fURL = fURL.substr(0, fURL.length() - 1); }
-
     fMaximumTimeout = 4 * 60; //4 minutes
 
     // If UsqSQLite is true, hunt for sqlite database file.
@@ -51,7 +49,6 @@ namespace lariov {
       log << fURL2 << "\n"
           << "\n";
     }
-
     if (fTestMode && fUseSQLite) {
       mf::LogInfo log("DBFolder");
       log << "\nDBFolder test mode, will compare the following url and sqlite data."
@@ -73,7 +70,6 @@ namespace lariov {
 
   DBDataset DBFolder::GetDataset(DBTimeStamp_t raw_time) const
   {
-
     //convert to IOVTimeStamp
     IOVTimeStamp ts = TimeStampDecoder::DecodeTimeStamp(raw_time);
 
@@ -250,7 +246,6 @@ namespace lariov {
         << " AND " << table_iovs << ".iov_id=" << table_tag_iovs << ".iov_id"
         << " AND " << table_data << ".__iov_id=" << table_tag_iovs << ".iov_id"
         << " AND " << table_iovs << ".begin_time <= " << t;
-
     // Prepare query.
 
     rc = sqlite3_prepare_v2(db, sql.str().c_str(), -1, &stmt, 0);

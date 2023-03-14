@@ -27,8 +27,6 @@
 #include "fhiclcpp/ParameterSet.h"
 #include "fhiclcpp/coding.h"
 
-#include <any> // std::any replaces boost::any
-
 // C/C++ standard library
 #include <algorithm> // std::equal(), std::transform()
 #include <iostream>
