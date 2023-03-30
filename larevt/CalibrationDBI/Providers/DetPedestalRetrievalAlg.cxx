@@ -169,12 +169,12 @@ namespace lariov {
   bool DetPedestalRetrievalAlg::DBUpdate(DBTimeStamp_t ts) const
   {
 
+    // A static mutex that is shared across all invocations of the function.
+    static std::mutex mutex;
+    std::lock_guard<std::mutex> lock(mutex);
+
     bool result = false;
     if (fDataSource == DataSource::Database && ts != fCurrentTimeStamp) {
-
-      // A static mutex that is shared across all invocations of the function.
-      static std::mutex mutex;
-      std::lock_guard<std::mutex> lock(mutex);
 
       mf::LogInfo("DetPedestalRetrievalAlg")
         << "DetPedestalRetrievalAlg::DBUpdate called with new timestamp.";
