@@ -41,6 +41,11 @@ adcfilter:
  MinADC:           30
 }
 
+nufilter:
+{ 
+ module_type: "NuFilter"
+}
+
 evtfilter:
 {
  module_type:      "EventFilter"

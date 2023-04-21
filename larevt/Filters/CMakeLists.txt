@@ -24,6 +24,9 @@ cet_build_plugin(ADCFilter art::EDFilter
   lardataobj::RawData
 )
 cet_build_plugin(EventFilter art::EDFilter)
+cet_build_plugin(NuFilter art::EDFilter
+  LIBRARIES PRIVATE
+  nusimdata::SimulationBase)
 cet_build_plugin(EventTimeFilter art::EDFilter
   LIBRARIES PRIVATE
   ROOT::Core
